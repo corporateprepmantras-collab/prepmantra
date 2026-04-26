@@ -1,0 +1,417 @@
+import Link from "next/link";
+import ItCertFaqs from "@/components/public/ItCertFaqs";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
+// ✅ Enable ISR for better performance
+export const dynamic = "force-dynamic";
+export const revalidate = 0; // Real-time updates - no caching
+
+// Loading skeleton component
+function CategorySkeleton() {
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg shadow-md flex flex-col items-center overflow-hidden w-[160px] sm:w-[180px] md:w-[200px] lg:w-[220px] animate-pulse">
+      <div className="h-28 sm:h-32 md:h-36 lg:h-40 w-full bg-gray-200" />
+      <div className="px-3 pb-4 w-full pt-3">
+        <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto" />
+      </div>
+    </div>
+  );
+}
+
+/* ===========================
+   ✅ Get correct base URL for server-side fetches
+   =========================== */
+function getBaseURL() {
+  // Server-side only
+  if (typeof window === "undefined") {
+    // 1. Use explicit production URL from env
+    if (process.env.NEXT_PUBLIC_BASE_URL) {
+      return process.env.NEXT_PUBLIC_BASE_URL;
+    }
+
+    // 2. Vercel auto-detection
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`;
+    }
+
+    // 3. Production fallback
+    if (process.env.NODE_ENV === "production") {
+      return "https://www.prepmantras.com";
+    }
+
+    // 4. Local development
+    return "http://localhost:3000";
+  }
+
+  // Client-side: use relative paths
+  return "";
+}
+
+/* ===========================
+   ✅ Fetch SEO data (Server-side)
+   =========================== */
+async function fetchSEO() {
+  try {
+    const baseUrl = getBaseURL();
+    const url = `${baseUrl}/api/seo/sap`;
+
+    console.log(`🔍 [SEO] Fetching from: ${url}`);
+
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+      },
+    });
+
+    if (!res.ok) {
+      console.error(`❌ [SEO] Fetch failed: ${res.status} ${res.statusText}`);
+      return {};
+    }
+
+    const json = await res.json();
+    console.log("✅ [SEO] Data fetched successfully");
+
+    // Handle both formats: {data: {...}} or {...directly}
+    return json.data || json;
+  } catch (error) {
+    console.error("❌ [SEO] Fetch error:", error.message);
+    return {};
+  }
+}
+
+/* ===========================
+   ✅ Fetch Product Categories with Retry (Only Published)
+   =========================== */
+async function getDumpsData() {
+  const maxRetries = 3;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const baseUrl = getBaseURL();
+      const url = `${baseUrl}/api/product-categories`;
+
+      console.log(`🔍 [Categories] Attempt ${attempt}/${maxRetries}: ${url}`);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        console.error(
+          `❌ [Categories] Fetch failed: ${res.status} ${res.statusText}`,
+        );
+
+        // Retry on server errors (500+)
+        if (res.status >= 500 && attempt < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+          continue;
+        }
+
+        return [];
+      }
+
+      const json = await res.json();
+
+      // Extract array from different response formats
+      let categories = [];
+      if (Array.isArray(json.data)) {
+        categories = json.data;
+      } else if (Array.isArray(json)) {
+        categories = json;
+      } else if (json.categories && Array.isArray(json.categories)) {
+        categories = json.categories;
+      }
+
+      // ✅ Filter only published categories
+      const publishedCategories = categories.filter(
+        (cat) => cat.status === "Publish",
+      );
+
+      console.log(
+        `✅ [Categories] Fetched ${categories.length} total, ${publishedCategories.length} published`,
+      );
+      return publishedCategories;
+    } catch (error) {
+      lastError = error;
+      console.error(`❌ [Categories] Attempt ${attempt} error:`, error.message);
+
+      // Wait before retry (exponential backoff)
+      if (attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+  }
+
+  console.error("❌ [Categories] All retries failed:", lastError?.message);
+  return [];
+}
+
+/* ===========================
+   ✅ Fetch IT Certifications Content
+   =========================== */
+async function getItCertificationsContent() {
+  try {
+    const baseUrl = getBaseURL();
+    const url = `${baseUrl}/api/itcertifications-content`;
+
+    console.log(`🔍 [IT Certifications Content] Fetching from: ${url}`);
+
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+      },
+    });
+
+    if (!res.ok) {
+      console.error(
+        `❌ [IT Certifications Content] Fetch failed: ${res.status} ${res.statusText}`,
+      );
+      return { upperPara: "", lowerPara: "" };
+    }
+
+    const json = await res.json();
+    console.log("✅ [IT Certifications Content] Data fetched successfully");
+
+    return json || { upperPara: "", lowerPara: "" };
+  } catch (error) {
+    console.error("❌ [IT Certifications Content] Fetch error:", error.message);
+    return { upperPara: "", lowerPara: "" };
+  }
+}
+
+/* ===========================
+   ✅ Fetch IT Certifications FAQs
+   =========================== */
+async function getItCertFaqs() {
+  try {
+    const baseUrl = getBaseURL();
+    const url = `${baseUrl}/api/itcert-faqs`;
+
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+      },
+    });
+
+    if (!res.ok) return [];
+    const json = await res.json();
+    return Array.isArray(json) ? json : json || [];
+  } catch (error) {
+    console.error("❌ [IT FAQs] Fetch error:", error.message);
+    return [];
+  }
+}
+
+/* ===========================
+   ✅ Dynamic Metadata
+   =========================== */
+export async function generateMetadata() {
+  const seo = await fetchSEO();
+
+  const defaultTitle = "SAP Dumps – Prepmantras";
+  const defaultDescription =
+    "Get the latest SAP certification dumps and verified exam prep materials at Prepmantras.";
+
+  return {
+    title: seo.title || defaultTitle,
+    description: seo.description || defaultDescription,
+    keywords: seo.keywords || "SAP dumps, SAP certification, prepmantras",
+    alternates: {
+      canonical:
+        seo.canonicalurl || "https://www.prepmantras.com/itcertifications",
+    },
+    openGraph: {
+      title: seo.ogtitle || seo.title || defaultTitle,
+      description: seo.ogdescription || seo.description || defaultDescription,
+      images: [
+        {
+          url: seo.ogimage || "/default-og.jpg",
+          width: 1200,
+          height: 630,
+        },
+      ],
+      url: seo.ogurl || "https://www.prepmantras.com/itcertifications",
+      siteName: "Prepmantras",
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.twittertitle || seo.title || defaultTitle,
+      description:
+        seo.twitterdescription || seo.description || defaultDescription,
+      images: [seo.twitterimage || seo.ogimage || "/default-og.jpg"],
+    },
+  };
+}
+
+/* ===========================
+   ✅ Utility – Create SEO-Friendly Slug
+   =========================== */
+function createSlug(name) {
+  if (!name) return "";
+
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-"); // Remove duplicate hyphens
+}
+
+/* ===========================
+   ✅ Page Component
+   =========================== */
+export default async function itcertificationsPage() {
+  const startTime = Date.now();
+  console.log("\n🚀 [itcertifications Page] Starting render...");
+
+  const dumpsData = await getDumpsData();
+  const itCertContent = await getItCertificationsContent();
+  const itCertFaqs = await getItCertFaqs();
+
+  const renderTime = Date.now() - startTime;
+  console.log(
+    `✅ [itcertifications Page] Rendered in ${renderTime}ms with ${dumpsData.length} published categories\n`,
+  );
+
+  // Preload images for better performance
+  const priorityCount = Math.min(6, dumpsData.length);
+
+  return (
+    <div className="min-h-screen w-full pt-16 sm:pt-20 md:pt-24 lg:pt-28 pb-10 sm:pb-12 md:pb-16 lg:pb-20 bg-white">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+        {/* Header */}
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gray-900 mb-1 sm:mb-2">
+          IT Certifications Exam Dumps – Pass Your Certification on First
+          Attempt
+        </h1>
+
+        {/* Introduction Section */}
+        <div className="mb-6 sm:mb-8 px-4 sm:px-6 md:px-8">
+          {itCertContent.upperPara ? (
+            <div
+              className="text-gray-800 text-center text-sm sm:text-base md:text-lg leading-relaxed prose max-w-none prose-p:mt-0 prose-p:mb-2 prose-strong:text-gray-900 prose-strong:font-bold"
+              dangerouslySetInnerHTML={{ __html: itCertContent.upperPara }}
+            />
+          ) : (
+            <p className="text-gray-800 text-center text-sm sm:text-base md:text-lg leading-relaxed">
+              Welcome to the ultimate destination for{" "}
+              <strong>latest IT certification exam preparation</strong>. Get{" "}
+              <strong>latest exam dumps</strong>,{" "}
+              <strong>real exam questions</strong>, and verified{" "}
+              <strong>question and answers PDF files</strong> designed to help
+              you achieve a <strong>100% passing result</strong> on your first
+              attempt.
+            </p>
+          )}
+        </div>
+
+        {/* Categories Grid */}
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+          {dumpsData.length > 0 ? (
+            dumpsData.map((item, index) => {
+              const slug = createSlug(item.name);
+
+              if (!slug) {
+                console.warn(`⚠️ Invalid slug for category: ${item.name}`);
+                return null;
+              }
+
+              const isPriority = index < priorityCount;
+
+              return (
+                <Link
+                  key={item._id || item.id}
+                  href={`/itcertifications/${slug}`}
+                  className="group bg-white border-2 border-gray-200 rounded-xl sm:rounded-2xl shadow-md hover:shadow-2xl hover:border-blue-300 active:scale-95 md:hover:scale-105 transition-all duration-300 flex flex-col items-center text-center overflow-hidden w-[120px] sm:w-[135px] md:w-[150px] lg:w-[160px] xl:w-[170px] h-[70px] sm:h-[80px] md:h-[90px] lg:h-[100px] xl:h-[110px]"
+                >
+                  {/* Image Container */}
+                  <div className="h-8 sm:h-10 md:h-12 lg:h-14 xl:h-16 w-full relative bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors duration-300 flex items-center justify-center">
+                    <ImageWithSkeleton
+                      src={item.image || "https://via.placeholder.com/150"}
+                      alt={item.name || "Category"}
+                      fill
+                      className="object-contain p-0.5 sm:p-1 md:p-1.5 group-hover:scale-110 transition-transform duration-300"
+                      sizes="(max-width: 640px) 120px, (max-width: 768px) 135px, (max-width: 1024px) 150px, (max-width: 1280px) 160px, 170px"
+                      loading={isPriority ? "eager" : "lazy"}
+                      priority={isPriority}
+                      quality={75}
+                      skeletonClassName="rounded-t-xl sm:rounded-t-2xl"
+                    />
+                  </div>
+
+                  {/* Text Container */}
+                  <div className="px-1.5 sm:px-2 md:px-2.5 py-0.5 sm:py-1 md:py-1.5 w-full bg-white group-hover:bg-gradient-to-r group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors duration-300 flex-1 flex items-center justify-center">
+                    <h3 className="text-[10px] sm:text-xs md:text-sm font-bold capitalize text-gray-800 group-hover:text-blue-700 truncate transition-colors duration-300">
+                      {item.name || "Unnamed Category"}
+                    </h3>
+                  </div>
+                </Link>
+              );
+            })
+          ) : (
+            <div className="text-center py-16 sm:py-20 md:py-24 lg:py-32 w-full">
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 p-8 sm:p-10 md:p-12 max-w-md mx-auto">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <p className="text-gray-700 text-lg sm:text-xl md:text-2xl font-semibold mb-3">
+                  No categories available
+                </p>
+                <p className="text-gray-500 text-sm sm:text-base md:text-lg">
+                  Please check back later for updates.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Detailed Content Section */}
+        {itCertContent.lowerPara && (
+          <div className="mt-12 sm:mt-14 md:mt-16 lg:mt-20 px-4 sm:px-6 md:px-8 pb-8 sm:pb-10 md:pb-12">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg p-6 sm:p-8 md:p-10 lg:p-12 border border-gray-200">
+              <div
+                className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:md:text-4xl prose-h2:mb-6 prose-h2:border-b-4 prose-h2:border-blue-600 prose-h2:pb-3 prose-p:text-gray-700 prose-p:text-base prose-p:sm:text-lg prose-p:leading-relaxed prose-ul:space-y-3 prose-li:text-gray-800 prose-strong:text-gray-900 prose-strong:font-semibold"
+                dangerouslySetInnerHTML={{ __html: itCertContent.lowerPara }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* FAQs Section (animated client component) */}
+        {itCertFaqs && itCertFaqs.length > 0 && (
+          <ItCertFaqs faqs={itCertFaqs} />
+        )}
+      </div>
+    </div>
+  );
+}
