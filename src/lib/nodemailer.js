@@ -14,6 +14,17 @@ export async function sendNotificationEmail(contact) {
     throw new Error("Email configuration is missing");
   }
 
+  if (process.env.DISABLE_EMAILS === "1") {
+    console.warn(
+      "Emails disabled via DISABLE_EMAILS=1, skipping sendNotificationEmail",
+    );
+    return Promise.resolve({
+      accepted: [],
+      rejected: [],
+      response: "emails-disabled",
+    });
+  }
+
   const transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: SMTP_PORT,
@@ -80,6 +91,17 @@ export async function sendReplyEmail(contact, replyMessage, customSubject) {
 
   if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
     throw new Error("Email configuration is missing");
+  }
+
+  if (process.env.DISABLE_EMAILS === "1") {
+    console.warn(
+      "Emails disabled via DISABLE_EMAILS=1, skipping sendReplyEmail",
+    );
+    return Promise.resolve({
+      accepted: [],
+      rejected: [],
+      response: "emails-disabled",
+    });
   }
 
   const transporter = nodemailer.createTransport({
