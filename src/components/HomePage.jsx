@@ -24,34 +24,28 @@ const ExamDumpsSlider = dynamic(() => import("@/landingpage/ExamDumpsSlider"), {
   loading: () => <LoadingBox />,
 });
 const BlogSection = dynamic(() => import("@/landingpage/BlogSection"), {
-  ssr: false,
-  loading: () => <LoadingBox />,
+  ssr: true,
 });
 const UnlockGoals = dynamic(() => import("@/landingpage/UnlockGoals"), {
-  ssr: false,
-  loading: () => <LoadingBox />,
+  ssr: true,
 });
 const GeneralFAQs = dynamic(() => import("@/landingpage/GeneralFAQs"), {
-  ssr: false,
-  loading: () => <LoadingBox />,
+  ssr: true,
 });
 const ContentDumpsFirst = dynamic(
   () => import("@/landingpage/ContentBoxFirst"),
   {
-    ssr: false,
-    loading: () => <LoadingBox />,
+    ssr: true,
   },
 );
 const ContentDumpsSecond = dynamic(
   () => import("@/landingpage/ContentBoxSecond"),
   {
-    ssr: false,
-    loading: () => <LoadingBox />,
+    ssr: true,
   },
 );
 const Testimonial = dynamic(() => import("@/landingpage/Testimonial"), {
-  ssr: false,
-  loading: () => <LoadingBox />,
+  ssr: true,
 });
 
 const BENEFITS = [
@@ -108,64 +102,29 @@ export default function HomePage({
 }) {
   const [showModal, setShowModal] = useState(false);
   const [showDebugInfo, setShowDebugInfo] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [trendingItems, setTrendingItems] = useState([]);
   const [trendingCategories, setTrendingCategories] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Use server-provided props for trending lists when available
+  useEffect(() => {
+    if (Array.isArray(dumps) && dumps.length > 0) setTrendingItems(dumps);
+    if (Array.isArray(categories) && categories.length > 0)
+      setTrendingCategories(categories);
+    if (Array.isArray(products) && products.length > 0)
+      setTrendingProducts(products);
+  }, [dumps, categories, products]);
 
   useEffect(() => {
-    const fetchTrending = async () => {
-      try {
-        const res = await fetch("/api/trending");
-        const data = await res.json();
-        setTrendingItems(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch trending items:", error);
-      }
-    };
-    const fetchTrendingCategories = async () => {
-      try {
-        const res = await fetch("/api/trending-categories");
-        const data = await res.json();
-        setTrendingCategories(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch trending categories:", error);
-      }
-    };
-    const fetchTrendingProducts = async () => {
-      try {
-        const res = await fetch("/api/trending-products");
-        const data = await res.json();
-        setTrendingProducts(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch trending products:", error);
-      }
-    };
-    if (mounted) {
-      fetchTrending();
-      fetchTrendingCategories();
-      fetchTrendingProducts();
-    }
-  }, [mounted]);
-
-  useEffect(() => {
-    setMounted(true);
-    setIsInitialLoad(false);
+    if (typeof window === "undefined") return;
+    const handleScroll = () => setShowScrollTop(window.pageYOffset > 300);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-    const handleScroll = () => {
-      setShowScrollTop(window.pageYOffset > 300);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [mounted]);
-
-  useEffect(() => {
-    if (!mounted || !announcement?.active) return;
+    if (typeof window === "undefined" || !announcement?.active) return;
     const lastShown = safeStorage.get("announcementShownAt");
     const now = Date.now();
     const oneHour = 60 * 60 * 1000;
@@ -178,10 +137,10 @@ export default function HomePage({
       }, delay);
       return () => clearTimeout(timer);
     }
-  }, [announcement, mounted]);
+  }, [announcement]);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (typeof window === "undefined") return;
     const handleKeyPress = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "B") {
         e.preventDefault();
@@ -201,7 +160,7 @@ export default function HomePage({
     };
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [mounted]);
+  }, []);
 
   const closeModal = useCallback(() => setShowModal(false), []);
   const handleClearCache = useCallback(() => {
@@ -219,26 +178,6 @@ export default function HomePage({
   }, []);
 
   const hasDataIssues = dumps.length === 0 || faqs.length === 0;
-
-  if (!mounted || isInitialLoad) {
-    return (
-      <div className="min-h-screen bg-[#f8f9fb]">
-        <section className="w-full pt-24 px-4 sm:px-6 lg:px-16">
-          <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-12">
-            <div className="w-full lg:w-1/2 space-y-4">
-              <div className="h-3 bg-slate-200 rounded-full animate-pulse w-1/4"></div>
-              <div className="h-12 bg-slate-200 rounded-2xl animate-pulse w-3/4"></div>
-              <div className="h-5 bg-slate-200 rounded-full animate-pulse w-full"></div>
-              <div className="h-5 bg-slate-200 rounded-full animate-pulse w-5/6"></div>
-            </div>
-            <div className="w-full lg:w-1/2">
-              <div className="w-full max-w-[500px] h-[320px] bg-slate-200 rounded-3xl animate-pulse mx-auto"></div>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
-  }
 
   return (
     <>
