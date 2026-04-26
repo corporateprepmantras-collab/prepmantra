@@ -1,5 +1,6 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Inter, DM_Sans, DM_Serif_Display } from "next/font/google";
+import banner from "@/assets/landingassets/img1.webp";
 import dynamic from "next/dynamic";
 import Script from "next/script";
 import Providers from "@/components/providers";
@@ -13,6 +14,22 @@ const inter = Inter({
   variable: "--font-inter",
   weight: ["400", "700"],
   fallback: ["system-ui", "arial"],
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "700"],
+  preload: true,
+});
+
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-serif",
+  weight: ["400"],
+  preload: true,
 });
 
 // ✅ Lazy load navbar and footer
@@ -152,7 +169,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} scroll-smooth`}
+      className={`${inter.variable} ${dmSans.variable} ${dmSerif.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -172,22 +189,15 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
 
-        {/* Preconnects for faster loading */}
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
+        {/* Preconnect: only for critical external origins (GA) - fonts are served locally using next/font */}
         <link
           rel="preconnect"
           href="https://www.googletagmanager.com"
           crossOrigin="anonymous"
         />
+
+        {/* Preload hero image for faster LCP */}
+        <link rel="preload" as="image" href={banner.src} />
 
         <meta
           name="robots"
@@ -199,7 +209,7 @@ export default function RootLayout({ children }) {
       </head>
 
       <body
-        className={`${inter.className} antialiased bg-white min-h-screen flex flex-col`}
+        className={`${inter.className} ${dmSans.className} ${dmSerif.className} antialiased bg-white min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         {/* ✅ Google Analytics — loaded after page is interactive, no render blocking */}

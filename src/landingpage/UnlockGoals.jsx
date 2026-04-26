@@ -17,7 +17,8 @@ const cardData = [
     icon: downloadable,
     title: "Downloadable PDF",
     subtitle: "Questions & Answers",
-    description: "100% original and verified IT Certification Prep for all exams. Download and study offline anytime.",
+    description:
+      "100% original and verified IT Certification Prep for all exams. Download and study offline anytime.",
     badge: "PDF Download",
     accent: "#2563eb",
     accentLight: "#eff6ff",
@@ -27,7 +28,8 @@ const cardData = [
     icon: affordable,
     title: "Affordable Price",
     subtitle: "Best Value Guaranteed",
-    description: "Premium exam materials at prices that never break the bank. Reasonable and accessible for everyone.",
+    description:
+      "Premium exam materials at prices that never break the bank. Reasonable and accessible for everyone.",
     badge: "Budget Friendly",
     accent: "#059669",
     accentLight: "#ecfdf5",
@@ -37,7 +39,8 @@ const cardData = [
     icon: moneyBack,
     title: "Money Back",
     subtitle: "100% Guarantee",
-    description: "Zero risk to you. If our resources don't meet expectations, claim a full refund — no questions asked.",
+    description:
+      "Zero risk to you. If our resources don't meet expectations, claim a full refund — no questions asked.",
     badge: "Risk Free",
     accent: "#dc2626",
     accentLight: "#fff1f2",
@@ -47,7 +50,8 @@ const cardData = [
     icon: support,
     title: "24/7 Support",
     subtitle: "Always Here for You",
-    description: "Live customer support to keep your learning smooth and effortless, any hour of the day.",
+    description:
+      "Live customer support to keep your learning smooth and effortless, any hour of the day.",
     badge: "Always On",
     accent: "#7c3aed",
     accentLight: "#f5f3ff",
@@ -57,7 +61,8 @@ const cardData = [
     icon: freeUpdate,
     title: "Free Updates",
     subtitle: "Up to 90 Days",
-    description: "Stay current with free updates on all certification materials for a full 90 days post-purchase.",
+    description:
+      "Stay current with free updates on all certification materials for a full 90 days post-purchase.",
     badge: "90 Days Free",
     accent: "#ea580c",
     accentLight: "#fff7ed",
@@ -67,7 +72,8 @@ const cardData = [
     icon: validDumps,
     title: "100% Valid Prep",
     subtitle: "Verified & Accurate",
-    description: "Every question and answer is validated by industry experts for guaranteed certification success.",
+    description:
+      "Every question and answer is validated by industry experts for guaranteed certification success.",
     badge: "100% Valid",
     accent: "#0891b2",
     accentLight: "#ecfeff",
@@ -77,7 +83,8 @@ const cardData = [
     icon: freesample,
     title: "Free Sample",
     subtitle: "Try Before You Buy",
-    description: "Test drive our materials completely free before committing. Quality you can verify upfront.",
+    description:
+      "Test drive our materials completely free before committing. Quality you can verify upfront.",
     badge: "Try Free",
     accent: "#0d9488",
     accentLight: "#f0fdfa",
@@ -87,7 +94,8 @@ const cardData = [
     icon: specialDiscount,
     title: "Special Discounts",
     subtitle: "Limited Time Offers",
-    description: "Exclusive deals on top-selling certification prep. Save big on the materials you need most.",
+    description:
+      "Exclusive deals on top-selling certification prep. Save big on the materials you need most.",
     badge: "Limited Offer",
     accent: "#d97706",
     accentLight: "#fffbeb",
@@ -116,7 +124,7 @@ const WhyChooseSection = () => {
           }
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0.12 },
     );
     cardEls.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
@@ -125,8 +133,6 @@ const WhyChooseSection = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
-
         .wcs2-root * { box-sizing: border-box; }
         .wcs2-root { font-family: 'DM Sans', sans-serif; }
         .wcs2-serif { font-family: 'DM Serif Display', serif; }
@@ -331,27 +337,67 @@ const WhyChooseSection = () => {
 
       <section className="wcs2-root w-full bg-[#f8f9fb] py-16 px-4 sm:px-8 lg:px-16">
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-
           {/* ── Section Header ── */}
           <div className="wcs2-header">
             <div>
-              <p style={{
-                fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
-                textTransform: "uppercase", color: "#94a3b8",
-                margin: "0 0 8px", display: "flex", alignItems: "center", gap: 8,
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#13677c", display: "inline-block" }} />
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#94a3b8",
+                  margin: "0 0 8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "#13677c",
+                    display: "inline-block",
+                  }}
+                />
                 Why choose us
               </p>
-              <h2 className="wcs2-serif" style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)", color: "#0f172a", lineHeight: 1.15, margin: "0 0 8px" }}>
+              <h2
+                className="wcs2-serif"
+                style={{
+                  fontSize: "clamp(1.8rem, 4vw, 2.6rem)",
+                  color: "#0f172a",
+                  lineHeight: 1.15,
+                  margin: "0 0 8px",
+                }}
+              >
                 Why Choose <em>Prepmantras?</em>
               </h2>
               <p style={{ fontSize: 13, color: "#94a3b8", margin: 0 }}>
                 Everything you need to pass your certification — the first time.
               </p>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#94a3b8", flexShrink: 0 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#34d399", display: "inline-block" }} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 12,
+                color: "#94a3b8",
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: "#34d399",
+                  display: "inline-block",
+                }}
+              />
               {cardData.length} reasons to trust us
             </div>
           </div>
@@ -376,7 +422,9 @@ const WhyChooseSection = () => {
                 className={`wcs2-card${revealed.has(i) ? " revealed" : ""}`}
                 style={{
                   "--card-accent": card.accent,
-                  transitionDelay: revealed.has(i) ? `${(i % 4) * 70}ms` : "0ms",
+                  transitionDelay: revealed.has(i)
+                    ? `${(i % 4) * 70}ms`
+                    : "0ms",
                 }}
               >
                 {/* Image */}
@@ -385,7 +433,11 @@ const WhyChooseSection = () => {
                     src={card.icon}
                     alt={card.title}
                     fill
-                    style={{ objectFit: "contain", padding: "15px", backgroundColor: "#ffffff" }}
+                    style={{
+                      objectFit: "contain",
+                      padding: "15px",
+                      backgroundColor: "#ffffff",
+                    }}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                   <div className="wcs2-img-overlay" />
@@ -402,7 +454,9 @@ const WhyChooseSection = () => {
                 <div className="wcs2-body">
                   <div className="wcs2-titles">
                     <p className="wcs2-title">{card.title}</p>
-                    <p className="wcs2-subtitle" style={{ color: card.accent }}>{card.subtitle}</p>
+                    <p className="wcs2-subtitle" style={{ color: card.accent }}>
+                      {card.subtitle}
+                    </p>
                   </div>
 
                   <p className="wcs2-desc">{card.description}</p>
@@ -413,14 +467,19 @@ const WhyChooseSection = () => {
                     style={{ background: card.accentLight }}
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6h8M7 3l3 3-3 3" stroke={card.accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M2 6h8M7 3l3 3-3 3"
+                        stroke={card.accent}
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-
         </div>
       </section>
     </>
