@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { slugSegmentForUrl } from "@/lib/productPaths";
 
@@ -46,11 +46,22 @@ export default function ProductsList({ products, coursename }) {
     );
   }
 
+  const sortedProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    return [...products].sort((a, b) => {
+      const ta = (a.title || a.sapExamCode || "").toString().toLowerCase();
+      const tb = (b.title || b.sapExamCode || "").toString().toLowerCase();
+      if (ta < tb) return -1;
+      if (ta > tb) return 1;
+      return 0;
+    });
+  }, [products]);
+
   // Mobile Card View
   if (isMobile) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        {products.map((product) => (
+        {sortedProducts.map((product) => (
           <div
             key={product._id}
             className="group relative w-full bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-5 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden"
