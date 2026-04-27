@@ -54,7 +54,6 @@ export default function ProductsList({ products, coursename }) {
     );
   }
 
-
   // Mobile Card View
   if (isMobile) {
     return (
