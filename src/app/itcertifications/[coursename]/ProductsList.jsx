@@ -29,6 +29,16 @@ export default function ProductsList({ products, coursename }) {
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+  const sortedProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    return [...products].sort((a, b) => {
+      const ta = (a.title || a.sapExamCode || "").toString().toLowerCase();
+      const tb = (b.title || b.sapExamCode || "").toString().toLowerCase();
+      if (ta < tb) return -1;
+      if (ta > tb) return 1;
+      return 0;
+    });
+  }, [products]);
 
   // Show skeleton or nothing during SSR to prevent hydration mismatch
   if (!mounted) {
@@ -44,16 +54,6 @@ export default function ProductsList({ products, coursename }) {
     );
   }
 
-  const sortedProducts = useMemo(() => {
-    if (!Array.isArray(products)) return [];
-    return [...products].sort((a, b) => {
-      const ta = (a.title || a.sapExamCode || "").toString().toLowerCase();
-      const tb = (b.title || b.sapExamCode || "").toString().toLowerCase();
-      if (ta < tb) return -1;
-      if (ta > tb) return 1;
-      return 0;
-    });
-  }, [products]);
 
   // Mobile Card View
   if (isMobile) {
