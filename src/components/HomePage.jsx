@@ -633,272 +633,296 @@ export default function HomePage({
         </section>
 
         {/* ─── TRENDING CATEGORIES & PRODUCTS ─── */}
-        {trendingCategories?.length > 0 && (
-          <section className="py-10 sm:py-10 px-5 sm:px-8 lg:px-16 bg-[#f8f9fb]">
-            <div className="tc-root max-w-7xl mx-auto">
-              {/* Section Header */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                  justifyContent: "space-between",
-                  gap: "1rem",
-                  marginBottom: "3rem",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div>
-                  <p
+        {(() => {
+          const visibleCategories = (trendingCategories || []).filter(
+            (category) =>
+              (trendingProducts || []).some(
+                (p) => p.trendingCategoryId === category._id,
+              ),
+          );
+          if (visibleCategories.length === 0) return null;
+
+          return (
+            <>
+              <section className="py-10 sm:py-10 px-5 sm:px-8 lg:px-16 bg-[#f8f9fb]">
+                <div className="tc-root max-w-7xl mx-auto">
+                  {/* Section Header */}
+                  <div
                     style={{
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      color: "#94a3b8",
-                      marginBottom: "6px",
-                      margin: "0 0 6px",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "flex-end",
+                      justifyContent: "space-between",
+                      gap: "1rem",
+                      marginBottom: "3rem",
+                      flexWrap: "wrap",
                     }}
                   >
-                    Browse by category
-                  </p>
-                  <h2
-                    className="tc-display"
-                    style={{
-                      fontSize: "clamp(1.75rem, 4vw, 2.25rem)",
-                      color: "#0f172a",
-                      lineHeight: 1.2,
-                      margin: "0 0 6px",
-                    }}
-                  >
-                    Trending <em>Categories</em>
-                  </h2>
-                  <p style={{ fontSize: "13px", color: "#94a3b8", margin: 0 }}>
-                    Top-rated products across the most popular certifications
-                  </p>
-                </div>
+                    <div>
+                      <p
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                          color: "#94a3b8",
+                          marginBottom: "6px",
+                          margin: "0 0 6px",
+                        }}
+                      >
+                        Browse by category
+                      </p>
+                      <h2
+                        className="tc-display"
+                        style={{
+                          fontSize: "clamp(1.75rem, 4vw, 2.25rem)",
+                          color: "#0f172a",
+                          lineHeight: 1.2,
+                          margin: "0 0 6px",
+                        }}
+                      >
+                        Trending <em>Categories</em>
+                      </h2>
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          color: "#94a3b8",
+                          margin: 0,
+                        }}
+                      >
+                        Top-rated products across the most popular
+                        certifications
+                      </p>
+                    </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    fontSize: "12px",
-                    color: "#94a3b8",
-                    flexShrink: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "#34d399",
-                      display: "inline-block",
-                      animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
-                    }}
-                  />
-                  {trendingCategories.length} active{" "}
-                  {trendingCategories.length === 1 ? "category" : "categories"}
-                </div>
-              </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        fontSize: "12px",
+                        color: "#94a3b8",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          background: "#34d399",
+                          display: "inline-block",
+                          animation:
+                            "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
+                        }}
+                      />
+                      {visibleCategories.length} active{" "}
+                      {visibleCategories.length === 1
+                        ? "category"
+                        : "categories"}
+                    </div>
+                  </div>
 
-              {/* Category Blocks */}
-              <div className="flex flex-col gap-6">
-                {trendingCategories.map((category, catIndex) => {
-                  const categoryProducts = trendingProducts.filter(
-                    (p) => p.trendingCategoryId === category._id,
-                  );
+                  {/* Category Blocks */}
+                  <div className="flex flex-col gap-6">
+                    {visibleCategories.map((category, catIndex) => {
+                      const categoryProducts = trendingProducts.filter(
+                        (p) => p.trendingCategoryId === category._id,
+                      );
 
-                  // Consistent, alternating accent palette — teal & indigo
-                  const palette = [
-                    { accent: "#0f7ea8", light: "#e8f6fb", mid: "#0e6b8f" },
-                    { accent: "#4f46e5", light: "#eef2ff", mid: "#4338ca" },
-                    { accent: "#0d9488", light: "#f0fdfa", mid: "#0f766e" },
-                    { accent: "#7c3aed", light: "#f5f3ff", mid: "#6d28d9" },
-                  ];
-                  const { accent, light, mid } =
-                    palette[catIndex % palette.length];
+                      // Consistent, alternating accent palette — teal & indigo
+                      const palette = [
+                        { accent: "#0f7ea8", light: "#e8f6fb", mid: "#0e6b8f" },
+                        { accent: "#4f46e5", light: "#eef2ff", mid: "#4338ca" },
+                        { accent: "#0d9488", light: "#f0fdfa", mid: "#0f766e" },
+                        { accent: "#7c3aed", light: "#f5f3ff", mid: "#6d28d9" },
+                      ];
+                      const { accent, light, mid } =
+                        palette[catIndex % palette.length];
 
-                  return (
-                    <div key={category._id} className="tc-block">
-                      <div className="flex flex-col lg:flex-row">
-                        {/* ── Left Panel ── */}
-                        <div
-                          className="tc-left lg:w-[26%]"
-                          style={{
-                            background: `linear-gradient(160deg, ${light} 0%, #fff 100%)`,
-                          }}
-                        >
-                          {/* Blob */}
-                          <div
-                            className="tc-left-blob"
-                            style={{ background: accent }}
-                          />
-
-                          {/* Logo */}
-                          {category.image && (
-                            <div className="tc-logo-wrap">
-                              <img
-                                src={category.image}
-                                alt={category.title}
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  objectFit: "contain",
-                                }}
-                              />
-                            </div>
-                          )}
-
-                          {/* Count pill */}
-                          <div
-                            className="tc-count-badge"
-                            style={{
-                              background: light,
-                              color: mid,
-                              border: `1px solid ${accent}30`,
-                            }}
-                          >
-                            <svg
-                              width="8"
-                              height="8"
-                              viewBox="0 0 8 8"
-                              fill={accent}
-                            >
-                              <circle cx="4" cy="4" r="4" />
-                            </svg>
-                            {categoryProducts.length} product
-                            {categoryProducts.length !== 1 ? "s" : ""}
-                          </div>
-
-                          {/* Title & desc */}
-                          <h3 className="tc-cat-title">{category.title}</h3>
-                          {category.description && (
-                            <p className="tc-cat-desc">
-                              {category.description}
-                            </p>
-                          )}
-
-                          {/* CTA */}
-                          <Link href={`/${category.redirectLink}`}>
-                            <span
-                              className="tc-view-btn"
+                      return (
+                        <div key={category._id} className="tc-block">
+                          <div className="flex flex-col lg:flex-row">
+                            {/* ── Left Panel ── */}
+                            <div
+                              className="tc-left lg:w-[26%]"
                               style={{
-                                background: `linear-gradient(135deg, ${accent}, ${mid})`,
+                                background: `linear-gradient(160deg, ${light} 0%, #fff 100%)`,
                               }}
                             >
-                              Explore all
-                              <svg
-                                className="tc-arrow-icon"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2.5}
-                                  d="M5 12h14M13 6l6 6-6 6"
-                                />
-                              </svg>
-                            </span>
-                          </Link>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="tc-divider hidden lg:block" />
-
-                        {/* ── Right Products Panel ── */}
-                        <div className="flex-1 min-w-0">
-                          {categoryProducts.length > 0 ? (
-                            <div className="tc-products-wrap">
-                              <p className="tc-products-label">
-                                Popular products
-                              </p>
-
+                              {/* Blob */}
                               <div
+                                className="tc-left-blob"
+                                style={{ background: accent }}
+                              />
+
+                              {/* Logo */}
+                              {category.image && (
+                                <div className="tc-logo-wrap">
+                                  <img
+                                    src={category.image}
+                                    alt={category.title}
+                                    style={{
+                                      width: 40,
+                                      height: 40,
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Count pill */}
+                              <div
+                                className="tc-count-badge"
                                 style={{
-                                  display: "grid",
-                                  gridTemplateColumns:
-                                    "repeat(auto-fill, minmax(110px, 1fr))",
-                                  gap: "10px",
+                                  background: light,
+                                  color: mid,
+                                  border: `1px solid ${accent}30`,
                                 }}
                               >
-                                {categoryProducts
-                                  .slice(0, 10)
-                                  .map((product) => (
-                                    <Link
-                                      key={product._id}
-                                      href={`/${product.redirectLink}`}
-                                    >
-                                      <div className="tc-product-card">
-                                        <div className="tc-product-img">
-                                          {product.image ? (
-                                            <img
-                                              src={product.image}
-                                              alt={product.title}
-                                              style={{
-                                                width: "100%",
-                                                height: "100%",
-                                                objectFit: "contain",
-                                              }}
-                                            />
-                                          ) : (
-                                            <svg
-                                              style={{
-                                                width: 22,
-                                                height: 22,
-                                                color: "#cbd5e1",
-                                              }}
-                                              fill="none"
-                                              stroke="currentColor"
-                                              viewBox="0 0 24 24"
-                                            >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={1.5}
-                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                                              />
-                                            </svg>
-                                          )}
-                                        </div>
-                                        <p className="tc-product-title">
-                                          {product.title}
-                                        </p>
-                                      </div>
-                                    </Link>
-                                  ))}
+                                <svg
+                                  width="8"
+                                  height="8"
+                                  viewBox="0 0 8 8"
+                                  fill={accent}
+                                >
+                                  <circle cx="4" cy="4" r="4" />
+                                </svg>
+                                {categoryProducts.length} product
+                                {categoryProducts.length !== 1 ? "s" : ""}
                               </div>
+
+                              {/* Title & desc */}
+                              <h3 className="tc-cat-title">{category.title}</h3>
+                              {category.description && (
+                                <p className="tc-cat-desc">
+                                  {category.description}
+                                </p>
+                              )}
+
+                              {/* CTA */}
+                              <Link href={`/${category.redirectLink}`}>
+                                <span
+                                  className="tc-view-btn"
+                                  style={{
+                                    background: `linear-gradient(135deg, ${accent}, ${mid})`,
+                                  }}
+                                >
+                                  Explore all
+                                  <svg
+                                    className="tc-arrow-icon"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2.5}
+                                      d="M5 12h14M13 6l6 6-6 6"
+                                    />
+                                  </svg>
+                                </span>
+                              </Link>
                             </div>
-                          ) : (
-                            <div className="tc-empty">
-                              <svg
-                                style={{ width: 36, height: 36 }}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1.2}
-                                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5"
-                                />
-                              </svg>
-                              <p style={{ fontSize: 12 }}>No products yet</p>
+
+                            {/* Divider */}
+                            <div className="tc-divider hidden lg:block" />
+
+                            {/* ── Right Products Panel ── */}
+                            <div className="flex-1 min-w-0">
+                              {categoryProducts.length > 0 ? (
+                                <div className="tc-products-wrap">
+                                  <p className="tc-products-label">
+                                    Popular products
+                                  </p>
+
+                                  <div
+                                    style={{
+                                      display: "grid",
+                                      gridTemplateColumns:
+                                        "repeat(auto-fill, minmax(110px, 1fr))",
+                                      gap: "10px",
+                                    }}
+                                  >
+                                    {categoryProducts
+                                      .slice(0, 10)
+                                      .map((product) => (
+                                        <Link
+                                          key={product._id}
+                                          href={`/${product.redirectLink}`}
+                                        >
+                                          <div className="tc-product-card">
+                                            <div className="tc-product-img">
+                                              {product.image ? (
+                                                <img
+                                                  src={product.image}
+                                                  alt={product.title}
+                                                  style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "contain",
+                                                  }}
+                                                />
+                                              ) : (
+                                                <svg
+                                                  style={{
+                                                    width: 22,
+                                                    height: 22,
+                                                    color: "#cbd5e1",
+                                                  }}
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  viewBox="0 0 24 24"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={1.5}
+                                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                                                  />
+                                                </svg>
+                                              )}
+                                            </div>
+                                            <p className="tc-product-title">
+                                              {product.title}
+                                            </p>
+                                          </div>
+                                        </Link>
+                                      ))}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="tc-empty">
+                                  <svg
+                                    style={{ width: 36, height: 36 }}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={1.2}
+                                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5"
+                                    />
+                                  </svg>
+                                  <p style={{ fontSize: 12 }}>
+                                    No products yet
+                                  </p>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+            </>
+          );
+        })()}
 
         {/* ─── Lazy-loaded Sections (unchanged) ─── */}
         {/* {blogs.length > 0 && <BlogSection blogs={blogs} categories={categories} />} */}

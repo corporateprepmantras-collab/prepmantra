@@ -53,7 +53,13 @@ const getAPIUrl = () => {
 };
 
 // ✅ IMPROVED: Fetch with better error handling
-async function fetchWithTimeout(endpoint, timeoutMs = 10000, retries = 2) {
+// fetchWithTimeout now supports a cacheMode so server renders can be cached (ISR).
+async function fetchWithTimeout(
+  endpoint,
+  timeoutMs = 10000,
+  retries = 2,
+  cacheMode = "force-cache",
+) {
   const BASE_URL = getAPIUrl();
   const url = `${BASE_URL}${endpoint}`;
 
@@ -66,13 +72,11 @@ async function fetchWithTimeout(endpoint, timeoutMs = 10000, retries = 2) {
     try {
       const response = await fetch(url, {
         headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
           Accept: "application/json",
         },
         signal: controller.signal,
-        cache: "no-store",
+        // allow Next.js to cache server fetches when ISR is enabled
+        cache: cacheMode,
       });
 
       clearTimeout(timeoutId);
@@ -113,7 +117,12 @@ async function fetchWithTimeout(endpoint, timeoutMs = 10000, retries = 2) {
 
 // ✅ Fetch functions with fallbacks
 async function fetchDumps() {
-  const result = await fetchWithTimeout("/api/trending", 8000);
+  const result = await fetchWithTimeout(
+    "/api/trending",
+    8000,
+    2,
+    "force-cache",
+  );
   if (result.error) return [];
 
   const data = result.data;
@@ -128,7 +137,12 @@ async function fetchDumps() {
 }
 
 async function fetchCategories() {
-  const result = await fetchWithTimeout("/api/blogs/blog-categories", 8000);
+  const result = await fetchWithTimeout(
+    "/api/blogs/blog-categories",
+    8000,
+    2,
+    "force-cache",
+  );
   if (result.error) return [];
 
   const categories = Array.isArray(result.data)
@@ -142,7 +156,7 @@ async function fetchCategories() {
 
 async function fetchBlogs() {
   try {
-    const result = await fetchWithTimeout("/api/blogs", 8000);
+    const result = await fetchWithTimeout("/api/blogs", 8000, 2, "force-cache");
 
     if (!result || result.error) {
       console.error("fetchBlogs error:", result?.error);
@@ -177,7 +191,12 @@ async function fetchBlogs() {
 }
 
 async function fetchFAQs() {
-  const result = await fetchWithTimeout("/api/general-faqs", 8000);
+  const result = await fetchWithTimeout(
+    "/api/general-faqs",
+    8000,
+    2,
+    "force-cache",
+  );
   if (result.error) return [];
 
   const faqs = Array.isArray(result.data) ? [...result.data].reverse() : [];
@@ -185,28 +204,48 @@ async function fetchFAQs() {
 }
 
 async function fetchSEO() {
-  const result = await fetchWithTimeout("/api/seo/home", 8000);
+  const result = await fetchWithTimeout(
+    "/api/seo/home",
+    8000,
+    2,
+    "force-cache",
+  );
   if (result.error) return {};
 
   return result.data?.data || result.data || {};
 }
 
 async function fetchContent1() {
-  const result = await fetchWithTimeout("/api/content1", 5000);
+  const result = await fetchWithTimeout(
+    "/api/content1",
+    5000,
+    1,
+    "force-cache",
+  );
   if (result.error) return "";
 
   return result.data?.html || "";
 }
 
 async function fetchContent2() {
-  const result = await fetchWithTimeout("/api/content2", 5000);
+  const result = await fetchWithTimeout(
+    "/api/content2",
+    5000,
+    1,
+    "force-cache",
+  );
   if (result.error) return "";
 
   return result.data?.html || "";
 }
 
 async function fetchProducts() {
-  const result = await fetchWithTimeout("/api/products?limit=30", 8000);
+  const result = await fetchWithTimeout(
+    "/api/products?limit=30",
+    8000,
+    2,
+    "force-cache",
+  );
   if (result.error) return [];
 
   const data = result.data;
@@ -220,7 +259,12 @@ async function fetchProducts() {
 }
 
 async function fetchAnnouncement() {
-  const result = await fetchWithTimeout("/api/announcement", 5000);
+  const result = await fetchWithTimeout(
+    "/api/announcement",
+    5000,
+    1,
+    "force-cache",
+  );
   if (result.error) return null;
 
   return result.data || null;
@@ -311,7 +355,7 @@ export default async function Page() {
   );
 }
 
-// ✅ REAL-TIME: No caching for instant updates
-export const revalidate = 0; // Real-time updates
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
+// Enable ISR for the homepage to reduce document latency and speed up first loads.
+// This regenerates the page in the background every 5 minutes.
+export const revalidate = 300; // seconds
+export const dynamic = "auto";
