@@ -19,7 +19,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-white relative overflow-hidden">
+    <footer className="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-white relative overflow-hidden footer-force-white footer-font">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -83,7 +83,7 @@ export default function Footer() {
                     onClick={() =>
                       handleNavigation(`/category/${cat.toLowerCase()}`)
                     }
-                    className="hover:text-blue-400 transition-colors cursor-pointer"
+                    className="transition-colors cursor-pointer"
                   >
                     {cat}
                   </button>
@@ -104,7 +104,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation("/about")}
-                  className="hover:text-blue-400 transition-colors cursor-pointer text-left w-full"
+                  className="transition-colors cursor-pointer text-left w-full"
                 >
                   About Us
                 </button>
@@ -112,7 +112,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation("/itcertifications")}
-                  className="hover:text-blue-400 transition-colors cursor-pointer text-left w-full"
+                  className="transition-colors cursor-pointer text-left w-full"
                 >
                   IT Dumps
                 </button>
@@ -120,7 +120,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation("/guarantee")}
-                  className="hover:text-blue-400 transition-colors cursor-pointer text-left w-full"
+                  className="transition-colors cursor-pointer text-left w-full"
                 >
                   Guarantee
                 </button>
@@ -128,7 +128,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation("/privacy-policy")}
-                  className="hover:text-blue-400 transition-colors cursor-pointer text-left w-full"
+                  className="transition-colors cursor-pointer text-left w-full"
                 >
                   Privacy Policy
                 </button>
@@ -136,7 +136,7 @@ export default function Footer() {
               <li>
                 <button
                   onClick={() => handleNavigation("/terms")}
-                  className="hover:text-blue-400 transition-colors cursor-pointer text-left w-full"
+                  className="transition-colors cursor-pointer text-left w-full"
                 >
                   Terms & Conditions
                 </button>
