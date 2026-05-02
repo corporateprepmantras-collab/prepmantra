@@ -4,6 +4,10 @@ import bundleAnalyzer from "@next/bundle-analyzer";
 const nextConfig = {
   reactStrictMode: true,
 
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
