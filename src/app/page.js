@@ -7,7 +7,10 @@ import HomePage from "@/components/HomePage";
 // Enhanced metadata for better SEO
 export const metadata = {
   title: "Best IT Certification Exam Dumps & Practice Tests | 99% Pass Rate",
+<<<<<<< HEAD
   
+=======
+>>>>>>> d89532512fa78a06691b8a86219844789a909092
   description:
     "Get verified IT certification dumps for AWS, SAP, Azure, CompTIA & more. 50,000+ students passed with our practice tests. Money-back guarantee. Updated daily.",
   keywords: [
@@ -132,10 +135,14 @@ async function fetchDumps() {
   return data
     .map((dump) => ({
       _id: dump._id || dump.id || String(Math.random()),
+<<<<<<< HEAD
       title: dump.categoryName || "Untitled Certification",
       image: dump.categoryImage || "Untitled Certification",
       link: dump.link || "Untitled Certification",
       text: dump.text || "Untitled Certification",
+=======
+      title: dump.title || "Untitled Certification",
+>>>>>>> d89532512fa78a06691b8a86219844789a909092
     }))
     .slice(0, 20);
 }
