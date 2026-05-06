@@ -234,11 +234,7 @@ export default function ProductDetailsPage() {
 
   const productAvailable = isProductAvailable(product);
 
-<<<<<<< HEAD
-  // console.log("productAvailable", productAvailable);
-
-=======
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
   // Helper function for discount calculation
   const calculateDiscount = (mrp, price) => {
     if (!mrp || !price || mrp <= price) return 0;
@@ -309,18 +305,12 @@ export default function ProductDetailsPage() {
   const handleAddToCart = (type = "regular") => {
     if (!product) return;
 
-<<<<<<< HEAD
+ 
     // if ((type === "regular" || type === "combo") && !productAvailable) {
     //   toast.error("⚠️ This product is currently unavailable (PDF not found)");
     //   return;
     // }
-=======
-    if ((type === "regular" || type === "combo") && !productAvailable) {
-      toast.error("⚠️ This product is currently unavailable (PDF not found)");
-      return;
-    }
->>>>>>> d89532512fa78a06691b8a86219844789a909092
-
+ 
     if (
       type === "online" &&
       examPrices.priceInr === 0 &&
@@ -817,22 +807,14 @@ export default function ProductDetailsPage() {
               )}
 
               {/* PDF Downloadable Format */}
-<<<<<<< HEAD
-              {/* {pdfPrices && (pdfPrices.priceInr > 0 || pdfPrices.priceUsd > 0) && (
-=======
-              {pdfPrices && (pdfPrices.priceInr > 0 || pdfPrices.priceUsd > 0) && (
->>>>>>> d89532512fa78a06691b8a86219844789a909092
-                <div
+ 
+                {/* <div
                   className={`px-2 sm:px-4 lg:px-6 py-2.5 sm:py-3 lg:py-3.5 ${
                     !productAvailable ? "bg-gray-50 opacity-70" : ""
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-0">
-<<<<<<< HEAD
-                    
-=======
-                    {/* Product Name */}
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                     <div className="lg:w-64 lg:flex-shrink-0">
                       <h3 className="text-xs sm:text-sm lg:text-[15px] font-normal text-gray-900">
                         PDF Downloadable Format
@@ -844,11 +826,7 @@ export default function ProductDetailsPage() {
                       )}
                     </div>
 
-<<<<<<< HEAD
-                    
-=======
-                    {/* Pricing */}
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                     <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm lg:text-[15px] lg:mr-8">
                       <span className="text-orange-500">
                         ₹{pdfPrices.priceInr || "4999"},
@@ -861,11 +839,9 @@ export default function ProductDetailsPage() {
                       </span>
                     </div>
 
-<<<<<<< HEAD
+ 
                      
-=======
-                    {/* Action Buttons */}
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                     <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 lg:ml-auto w-full lg:w-auto">
                       <button
                         onClick={() =>
@@ -902,8 +878,8 @@ export default function ProductDetailsPage() {
                     </div>
                   </div>
                 </div>
-<<<<<<< HEAD
-              )} */}
+ 
+              )} */}  
 
 
 
@@ -975,9 +951,7 @@ export default function ProductDetailsPage() {
 
 
 
-=======
-              )}
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
 
               {/* Special Combo */}
               {comboPrices && (comboPrices.priceInr > 0 || comboPrices.priceUsd > 0) && (

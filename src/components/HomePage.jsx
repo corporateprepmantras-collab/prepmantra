@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Check, X, AlertCircle, ArrowUp } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-<<<<<<< HEAD
+ 
 import banner from "@/assets/landingassets/img2.jpeg";
-=======
-import banner from "@/assets/landingassets/img1.webp";
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+  
+ 
 
 const LoadingBox = () => (
   <div className="py-8 px-4">
@@ -111,12 +110,10 @@ export default function HomePage({
   const [trendingCategories, setTrendingCategories] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
 
-<<<<<<< HEAD
-
+ 
  
 
-=======
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
   // Use server-provided props for trending lists when available
   useEffect(() => {
     if (Array.isArray(dumps) && dumps.length > 0) setTrendingItems(dumps);
@@ -339,13 +336,10 @@ export default function HomePage({
               <div
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase mb-3 border"
                 style={{
-<<<<<<< HEAD
+ 
                   background: "#f98e1b5d",
                   color: "#020202",
-=======
-                  background: "rgba(19,103,124,0.07)",
-                  color: "#13677c",
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                   borderColor: "rgba(19,103,124,0.15)",
                 }}
               >
@@ -356,11 +350,9 @@ export default function HomePage({
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-[1.12] mb-5 tracking-tight">
                 Pass Your IT Certification{" "}
                 <span className="relative inline-block">
-<<<<<<< HEAD
+ 
                   <span className="relative z-10" style={{ color: "#f98d1b" }}>
-=======
-                  <span className="relative z-10" style={{ color: "#13677c" }}>
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                     On the First Try
                   </span>
                   <span
@@ -401,11 +393,9 @@ export default function HomePage({
                     className="px-7 py-3.5 rounded-2xl text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0"
                     style={{
                       background:
-<<<<<<< HEAD
+ 
                         "linear-gradient(135deg, #c52653 0%, #c52653 100%)",
-=======
-                        "linear-gradient(135deg, #13677c 0%, #0e4f5e 100%)",
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                     }}
                   >
                     Browse All Exams →
@@ -591,11 +581,9 @@ export default function HomePage({
                   <button
                     key={item._id}
                     onClick={() => {
-<<<<<<< HEAD
+ 
                       if (item.link) window.location.href = `${item.link}`;
-=======
-                      if (item.link) window.location.href = `/${item.link}`;
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
                     }}
                     className="group relative bg-white rounded-2xl p-4 text-left border border-slate-100 hover:border-orange-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 active:translate-y-0 cursor-pointer overflow-hidden"
                   >
@@ -958,14 +946,12 @@ export default function HomePage({
         <UnlockGoals />
         {/* {content2 && <ContentDumpsSecond content={content2} />} */}
         <Testimonial />
-<<<<<<< HEAD
-
+ 
  
   
 
 
-=======
->>>>>>> d89532512fa78a06691b8a86219844789a909092
+ 
         {faqs.length > 0 && <GeneralFAQs faqs={faqs} />}
       </div>
 
