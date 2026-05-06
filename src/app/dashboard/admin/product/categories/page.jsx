@@ -1,0 +1,509 @@
+"use client";
+
+import React, { useEffect, useState, useMemo } from "react";
+import axios from "axios";
+import dynamic from "next/dynamic";
+import "react-quill-new/dist/quill.snow.css";
+
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+
+const COLORS = [
+  "#000000",
+  "#FF0000",
+  "#00FF00",
+  "#0000FF",
+  "#FFA500",
+  "#800080",
+  "#808080",
+  "#FFFFFF",
+  "#FFD700",
+  "#008080",
+];
+
+export default function ProductCategories() {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    descriptionBelow: "",
+    image: null,
+    metaTitle: "",
+    metaKeywords: "",
+    metaDescription: "",
+    remarks: "",
+    schemaHere: "", // ✅ New field added
+    status: "Unpublish",
+    faqs: [{ question: "", answer: "" }],
+  });
+  const [previewImage, setPreviewImage] = useState("");
+  const [editingCategory, setEditingCategory] = useState(null);
+
+  // ✅ Memoize modules to prevent recreation
+  const quillModules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ color: COLORS }, { background: COLORS }],
+        [{ list: "ordered" }, { list: "bullet" }],
+        ["link", "blockquote", "code-block"],
+        ["clean"],
+      ],
+    }),
+    []
+  );
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "link",
+    "blockquote",
+    "code-block",
+    "color",
+    "background",
+  ];
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/product-categories");
+      setCategories(res.data);
+      setError("");
+    } catch (err) {
+      console.error("Fetch Error:", err);
+      setError("Failed to load categories");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image" && files && files[0]) {
+      const file = files[0];
+      setFormData((prev) => ({ ...prev, image: file }));
+      setPreviewImage(URL.createObjectURL(file));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleFaqChange = (index, field, value) => {
+    const updatedFaqs = [...formData.faqs];
+    updatedFaqs[index][field] = value;
+    setFormData((prev) => ({ ...prev, faqs: updatedFaqs }));
+  };
+
+  const addFaq = () => {
+    setFormData((prev) => ({
+      ...prev,
+      faqs: [...prev.faqs, { question: "", answer: "" }],
+    }));
+  };
+
+  const removeFaq = (index) => {
+    const updatedFaqs = formData.faqs.filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, faqs: updatedFaqs }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const data = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "faqs") {
+          data.append("faqs", JSON.stringify(value));
+        } else if (value instanceof File) {
+          data.append(key, value);
+        } else {
+          data.append(key, value ?? "");
+        }
+      });
+
+      data.set("description", formData.description || "");
+      data.set("descriptionBelow", formData.descriptionBelow || "");
+      data.set("schemaHere", formData.schemaHere || ""); // ✅ Include schemaHere
+
+      let res;
+      if (editingCategory) {
+        res = await axios.put(
+          `/api/product-categories/${editingCategory._id}`,
+          data,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      } else {
+        res = await axios.post("/api/product-categories", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+
+      if (res.status === 200 || res.status === 201) {
+        fetchCategories();
+        resetForm();
+      }
+    } catch (err) {
+      console.error("Submit Error:", err);
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      slug: "",
+      description: "",
+      descriptionBelow: "",
+      image: null,
+      metaTitle: "",
+      metaKeywords: "",
+      metaDescription: "",
+      remarks: "",
+      schemaHere: "", // ✅ Reset schemaHere
+      status: "Unpublish",
+      faqs: [{ question: "", answer: "" }],
+    });
+    setPreviewImage("");
+    setEditingCategory(null);
+  };
+
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setFormData({
+      name: category.name,
+      slug: category.slug || "",
+      description: category.description || "",
+      descriptionBelow: category.descriptionBelow || "",
+      image: null,
+      metaTitle: category.metaTitle || "",
+      metaKeywords: category.metaKeywords || "",
+      metaDescription: category.metaDescription || "",
+      remarks: category.remarks || "",
+      schemaHere: category.schemaHere || "", // ✅ Include schemaHere
+      status: category.status || "Unpublish",
+      faqs: category.faqs || [{ question: "", answer: "" }],
+    });
+    setPreviewImage(category.image);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+    try {
+      await axios.delete(`/api/product-categories/${id}`);
+      setCategories((prev) => prev.filter((cat) => cat._id !== id));
+    } catch (err) {
+      console.error("Delete Error:", err);
+      alert(err.response?.data?.message || "Delete failed");
+    }
+  };
+
+  const filteredCategories = categories.filter((cat) =>
+    cat.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="p-6 pt-20 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Manage Product Categories</h1>
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-lg shadow-md space-y-4 mb-8"
+      >
+        {error && (
+          <div className="p-3 bg-red-100 text-red-700 rounded">{error}</div>
+        )}
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Category Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        <input
+          type="text"
+          name="slug"
+          placeholder="Slug"
+          value={formData.slug}
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <ReactQuill
+            theme="snow"
+            value={formData.description}
+            onChange={(value) =>
+              setFormData((prev) => ({ ...prev, description: value }))
+            }
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write description..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Description Below
+          </label>
+          <ReactQuill
+            theme="snow"
+            value={formData.descriptionBelow}
+            onChange={(value) =>
+              setFormData((prev) => ({ ...prev, descriptionBelow: value }))
+            }
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Write description below..."
+          />
+        </div>
+
+        {/* ✅ New Schema Here Field */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Schema Here (JSON-LD)
+          </label>
+          <textarea
+            name="schemaHere"
+            placeholder='Enter schema markup (e.g., {"@context": "https://schema.org", ...})'
+            rows={4}
+            value={formData.schemaHere}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded font-mono text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Enter structured data markup for SEO (optional)
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold">FAQs</h2>
+          {formData.faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="p-3 border rounded bg-gray-50 space-y-2"
+            >
+              <input
+                type="text"
+                placeholder="Question"
+                value={faq.question}
+                onChange={(e) =>
+                  handleFaqChange(index, "question", e.target.value)
+                }
+                className="w-full border px-3 py-2 rounded"
+              />
+              <textarea
+                placeholder="Answer"
+                value={faq.answer}
+                onChange={(e) =>
+                  handleFaqChange(index, "answer", e.target.value)
+                }
+                className="w-full border px-3 py-2 rounded"
+              />
+              <button
+                type="button"
+                onClick={() => removeFaq(index)}
+                className="text-red-600 text-sm hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addFaq}
+            className="px-3 py-1 bg-green-600 text-white rounded"
+          >
+            + Add FAQ
+          </button>
+        </div>
+
+        <div>
+          {previewImage && (
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-32 h-32 object-cover rounded mb-2"
+            />
+          )}
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleChange}
+          />
+        </div>
+
+        <input
+          type="text"
+          name="metaTitle"
+          placeholder="Meta Title"
+          value={formData.metaTitle}
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+        />
+        <input
+          type="text"
+          name="metaKeywords"
+          placeholder="Meta Keywords (comma separated)"
+          value={formData.metaKeywords}
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+        />
+        <textarea
+          name="metaDescription"
+          placeholder="Meta Description"
+          rows={2}
+          value={formData.metaDescription}
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        <textarea
+          name="remarks"
+          placeholder="Remarks..."
+          rows={2}
+          value={formData.remarks}
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        {/* ✅ Fixed Status Dropdown - Only Publish/Unpublish */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Status</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded"
+          >
+            <option value="Publish">Publish</option>
+            <option value="Unpublish">Unpublish</option>
+          </select>
+        </div>
+
+        <div className="flex justify-end space-x-3">
+          <button
+            type="button"
+            onClick={resetForm}
+            className="px-4 py-2 border rounded hover:bg-gray-100"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            {isSubmitting
+              ? "Saving..."
+              : editingCategory
+              ? "Update Category"
+              : "Add Category"}
+          </button>
+        </div>
+      </form>
+
+      <input
+        type="text"
+        placeholder="Search categories..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="border p-2 w-full mb-4 rounded"
+      />
+
+      {loading ? (
+        <p>
+          <div className="flex items-center justify-center h-screen">
+            <div className="h-6 w-6 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+          </div>
+        </p>
+      ) : filteredCategories.length === 0 ? (
+        <p>No categories found.</p>
+      ) : (
+        <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+          <table className="w-full border">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-3 border">Image</th>
+                <th className="p-3 border">Name</th>
+                <th className="p-3 border">Slug</th>
+                <th className="p-3 border">Status</th>
+                <th className="p-3 border">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCategories.map((category) => (
+                <tr key={category._id} className="hover:bg-gray-50">
+                  <td className="p-3 border">
+                    {category.image ? (
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                    )}
+                  </td>
+                  <td className="p-3 border">{category.name}</td>
+                  <td className="p-3 border">{category.slug}</td>
+                  <td className="p-3 border">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        category.status === "Publish"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {category.status}
+                    </span>
+                  </td>
+                  <td className="p-3 border space-x-3">
+                    <button
+                      onClick={() => handleEdit(category)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(category._id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}

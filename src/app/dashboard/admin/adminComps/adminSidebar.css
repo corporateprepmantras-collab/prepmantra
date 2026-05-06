@@ -1,0 +1,102 @@
+/* Sidebar slide animation */
+
+.sidebar-open {
+  animation: slideIn 0.4s ease forwards;
+}
+
+.sidebar-close {
+  animation: slideOut 0.4s ease forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    width: 4rem;
+    opacity: 0.5;
+  }
+  100% {
+    width: 16rem;
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    width: 16rem;
+    opacity: 1;
+  }
+  100% {
+    width: 4rem;
+    opacity: 1;
+  }
+}
+
+/* Icon rotate animation */
+.toggle-animation {
+  transition: transform 0.4s ease-in-out;
+}
+
+.toggle-animation.open {
+  transform: rotate(0deg);
+}
+
+.toggle-animation.closed {
+  transform: rotate(180deg);
+}
+
+
+/* loading spinner animation css  */
+
+/* From Uiverse.io by adamgiebl */ 
+.dots-container {
+  display: flex;
+  margin-top: 50px;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; 
+  width: 100%;
+}
+
+.dot {
+  height: 20px;
+  width: 20px;
+  margin-right: 10px;
+  border-radius: 10px;
+  background-color: #b3d4fc;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.dot:last-child {
+  margin-right: 0;
+}
+
+.dot:nth-child(1) {
+  animation-delay: -0.3s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.1s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    background-color: #b3d4fc;
+    box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+  }
+
+  50% {
+    transform: scale(1.2);
+    background-color: #6793fb;
+    box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
+  }
+
+  100% {
+    transform: scale(0.8);
+    background-color: #b3d4fc;
+    box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+  }
+}
