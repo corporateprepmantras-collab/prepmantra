@@ -329,7 +329,7 @@ const BlogDetail = ({ slug }) => {
                     </svg>
                     Related Posts
                   </h3>
-                  <div className="space-y-3 sm:space-y-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     {recentBlogs.slice(0, 5).map((b, index) => (
                       <Link key={b._id} href={`/blog/${b.slug}`}>
                         <div className="group p-2 sm:p-3 rounded-lg sm:rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 cursor-pointer">
@@ -337,11 +337,12 @@ const BlogDetail = ({ slug }) => {
                           {b.imageUrl ? (
                             <div className="w-full overflow-hidden rounded-lg">
                               <img
-                                src={b.imageUrl}
-                                alt={b.title || b.sectionName}
-                                className="w-full h-28 sm:h-32 md:h-36 object-cover group-hover:scale-105 transition-transform duration-200"
-                                loading="lazy"
-                              />
+  src={b.imageUrl}
+  alt={b.title || b.sectionName}
+  /* Increased from h-30/32/36 to h-48/56/64 */
+  className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:scale-105 transition-transform duration-200"
+  loading="lazy"
+/>
                             </div>
                           ) : (
                             <div className="w-full h-28 sm:h-32 md:h-36 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center">

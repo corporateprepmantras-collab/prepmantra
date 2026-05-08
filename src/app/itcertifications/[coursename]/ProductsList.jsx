@@ -29,16 +29,22 @@ export default function ProductsList({ products, coursename }) {
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-  const sortedProducts = useMemo(() => {
-    if (!Array.isArray(products)) return [];
-    return [...products].sort((a, b) => {
-      const ta = (a.title || a.sapExamCode || "").toString().toLowerCase();
-      const tb = (b.title || b.sapExamCode || "").toString().toLowerCase();
-      if (ta < tb) return -1;
-      if (ta > tb) return 1;
-      return 0;
+
+
+const sortedProducts = useMemo(() => {
+  if (!Array.isArray(products)) return [];
+
+  return [...products].sort((a, b) => {
+    // .trim() is essential if your data has accidental spaces (e.g., " C_ARCIG")
+    const codeA = String(a.sapExamCode || "").trim();
+    const codeB = String(b.sapExamCode || "").trim();
+
+    return codeA.localeCompare(codeB, 'en', { 
+      sensitivity: 'base', // Ensures 'a' and 'A' are treated the same
+      numeric: true        // Ensures '2' comes before '10'
     });
-  }, [products]);
+  });
+}, [products]);
 
   // Show skeleton or nothing during SSR to prevent hydration mismatch
   if (!mounted) {
@@ -171,6 +177,9 @@ export default function ProductsList({ products, coursename }) {
             <th className="px-4 py-3 font-semibold text-center w-36">
               Details
             </th>
+            <th className="px-4 py-3 font-semibold text-center w-36">
+              Exam Support
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -216,6 +225,25 @@ export default function ProductsList({ products, coursename }) {
                   See Details
                 </Link>
               </td>
+
+              <td className="px-4 py-3 text-center">
+                 {product.showWpConnect ? (
+                  <span className="block font-bold text-blue-600 text-sm">
+                    <a
+                      href={`https://wa.me/9871952577?text=Hi%2C%20I'm%20interested%20in%20${encodeURIComponent(product.sapExamCode)}%20Exam%20Support`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Exam Support
+                    </a>
+                  </span>
+                ) : (
+                  <span className="block font-bold gap-1 text-green-600 text-base">
+                    
+                  </span>
+                )}
+              </td>
+
             </tr>
           ))}
         </tbody>
