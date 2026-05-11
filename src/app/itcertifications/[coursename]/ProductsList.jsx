@@ -3,10 +3,15 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { slugSegmentForUrl } from "@/lib/productPaths";
+import { usePathname } from 'next/navigation';
 
 export default function ProductsList({ products, coursename }) {
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // ✅ Get current pathname and define logic
+  const pathname = usePathname();
+  const isSapPage = pathname?.includes('/sap');
 
   // ✅ Price formatter with thousand grouping
   const formatPrice = (value, symbol = "₹") => {
@@ -30,21 +35,19 @@ export default function ProductsList({ products, coursename }) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const sortedProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
 
-const sortedProducts = useMemo(() => {
-  if (!Array.isArray(products)) return [];
+    return [...products].sort((a, b) => {
+      const codeA = String(a.sapExamCode || "").trim();
+      const codeB = String(b.sapExamCode || "").trim();
 
-  return [...products].sort((a, b) => {
-    // .trim() is essential if your data has accidental spaces (e.g., " C_ARCIG")
-    const codeA = String(a.sapExamCode || "").trim();
-    const codeB = String(b.sapExamCode || "").trim();
-
-    return codeA.localeCompare(codeB, 'en', { 
-      sensitivity: 'base', // Ensures 'a' and 'A' are treated the same
-      numeric: true        // Ensures '2' comes before '10'
+      return codeA.localeCompare(codeB, 'en', { 
+        sensitivity: 'base',
+        numeric: true
+      });
     });
-  });
-}, [products]);
+  }, [products]);
 
   // Show skeleton or nothing during SSR to prevent hydration mismatch
   if (!mounted) {
@@ -177,9 +180,12 @@ const sortedProducts = useMemo(() => {
             <th className="px-4 py-3 font-semibold text-center w-36">
               Details
             </th>
-            <th className="px-4 py-3 font-semibold text-center w-36">
-              Exam Support
-            </th>
+            {/* ✅ Header logic */}
+            {!isSapPage && (
+              <th className="px-4 py-3 font-semibold text-center w-36">
+                Exam Support
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -226,8 +232,9 @@ const sortedProducts = useMemo(() => {
                 </Link>
               </td>
 
-              <td className="px-4 py-3 text-center">
-                 {product.showWpConnect ? (
+              {/* ✅ TD logic */}
+              {!isSapPage && (
+                <td className="px-4 py-3 text-center">
                   <span className="block font-bold text-blue-600 text-sm">
                     <a
                       href={`https://wa.me/9871952577?text=Hi%2C%20I'm%20interested%20in%20${encodeURIComponent(product.sapExamCode)}%20Exam%20Support`}
@@ -237,13 +244,8 @@ const sortedProducts = useMemo(() => {
                       Exam Support
                     </a>
                   </span>
-                ) : (
-                  <span className="block font-bold gap-1 text-green-600 text-base">
-                    
-                  </span>
-                )}
-              </td>
-
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
