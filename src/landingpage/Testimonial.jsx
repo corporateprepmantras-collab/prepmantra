@@ -64,9 +64,7 @@ export default function TestimonialSection() {
 
   return (
     <>
-      <style>{`
-        .ts-root { font-family: 'DM Sans', sans-serif; }
-        .ts-serif { font-family: 'DM Serif Display', serif; }
+      <style>{` 
 
         .ts-card {
           background: #fff;

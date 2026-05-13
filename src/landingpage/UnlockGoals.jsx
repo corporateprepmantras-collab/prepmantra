@@ -134,8 +134,7 @@ const WhyChooseSection = () => {
     <>
       <style>{`
         .wcs2-root * { box-sizing: border-box; }
-        .wcs2-root { font-family: 'DM Sans', sans-serif; }
-        .wcs2-serif { font-family: 'DM Serif Display', serif; }
+        .wcs2-root { font-family: 'DM Sans', sans-serif; } 
 
         /* ── Card base ── */
         .wcs2-card {
