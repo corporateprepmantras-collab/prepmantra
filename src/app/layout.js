@@ -169,7 +169,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${dmSans.variable} ${dmSerif.variable} scroll-smooth`}
+      className={`${inter.variable} ${dmSans.variable}   scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -209,7 +209,7 @@ export default function RootLayout({ children }) {
       </head>
 
       <body
-        className={`${inter.className} ${dmSans.className} ${dmSerif.className} antialiased bg-white min-h-screen flex flex-col`}
+        className={`${inter.className}  antialiased bg-white min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         {/* ✅ Google Analytics — loaded after page is interactive, no render blocking */}
