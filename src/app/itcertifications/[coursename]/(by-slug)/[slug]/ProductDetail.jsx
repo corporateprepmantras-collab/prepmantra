@@ -582,7 +582,7 @@ export default function ProductDetailsPage() {
             <div className="bg-white rounded-lg p-0 sm:p-0 shadow-none">
               <div className="rounded-lg p-0 sm:p-0">
                 <img
-                  src={product.imageUrl}
+                  src={"/product.jpeg"}
                   alt={product.title}
                   className="w-full rounded-lg object-contain h-[220px] sm:h-[280px] lg:h-[400px] xl:h-[480px] 2xl:h-[520px] transition-all duration-300"
                   style={{

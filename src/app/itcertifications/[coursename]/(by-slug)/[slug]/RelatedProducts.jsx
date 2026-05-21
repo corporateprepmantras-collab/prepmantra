@@ -108,7 +108,7 @@ const ProductCard = memo(
           {/* Product Image */}
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden min-h-[200px] sm:min-h-[220px]">
             <Image
-              src={product.imageUrl || "/placeholder.png"}
+             src={"/product.jpeg"}
               alt={product.title}
               width={320}
               height={220}

@@ -427,7 +427,8 @@ export default function ExamDumpsSlider({ products = [] }) {
                       {/* Image Container */}
                       <div className="relative w-full h-40 sm:h-48 bg-gradient-to-br from-orange-50 to-orange-100 overflow-hidden flex-shrink-0">
                         <img
-                          src={product.imageUrl || "/placeholder.png"}
+                          // src={product.imageUrl || "/placeholder.png"}
+                          src={"/product.jpeg"}
                           alt={product.title}
                           className="w-full h-full object-contain object-center p-4 transition-transform duration-700 group-hover:scale-105 pointer-events-none"
                           loading="lazy"
