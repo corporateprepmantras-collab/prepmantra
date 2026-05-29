@@ -149,15 +149,15 @@ const ProductForm = ({ mode }) => {
       return;
     }
 
-    if (mode === "add" && !form.image) {
-      setError("Product image is required");
-      return;
-    }
+    // if (mode === "add" && !form.image) {
+    //   setError("Product image is required");
+    //   return;
+    // }
 
-    if (mode === "edit" && !form.image && !existingFiles.imageUrl) {
-      setError("Product image is required");
-      return;
-    }
+    // if (mode === "edit" && !form.image && !existingFiles.imageUrl) {
+    //   setError("Product image is required");
+    //   return;
+    // }
 
     setLoading(true);
 
