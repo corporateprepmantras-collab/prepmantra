@@ -229,7 +229,8 @@ const BlogPage = () => {
                         {blog.imageUrl && (
                           <div className="relative h-48 w-full overflow-hidden">
                             <img
-                              src={blog.imageUrl}
+                              // src={blog.imageUrl}
+                              src={"/product.jpeg"}
                               alt={
                                 blog.title || blog.sectionName || "Blog image"
                               }

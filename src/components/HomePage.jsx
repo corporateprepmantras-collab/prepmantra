@@ -940,7 +940,8 @@ export default function HomePage({
         })()}
 
         {/* ─── Lazy-loaded Sections (unchanged) ─── */}
-        {/* {blogs.length > 0 && <BlogSection blogs={blogs} categories={categories} />} */}
+        {blogs.length > 0 && <BlogSection blogs={blogs} categories={categories} />}
+         
         {products.length > 0 && <ExamDumpsSlider products={products} />}
         {content1 && <ContentDumpsFirst content={content1} />}
         <UnlockGoals />
