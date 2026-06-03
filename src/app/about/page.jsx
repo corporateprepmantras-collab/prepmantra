@@ -163,7 +163,9 @@ export default function AboutUs() {
                 >
                   <div className="relative h-52 bg-gradient-to-br from-orange-50 to-blue-50 overflow-hidden">
                     <img
-                      src={product.imageUrl || "/placeholder.png"}
+                      // src={product.imageUrl || "/placeholder.png"}
+                      src={"/product.jpeg"}
+
                       alt={product.title}
                       className="h-full w-full object-contain p-3 group-hover:scale-105 transition duration-700"
                     />
