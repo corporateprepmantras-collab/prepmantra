@@ -3,6 +3,13 @@ import { connectMongoDB } from "@/lib/mongo";
 import Blog from "@/models/blogSchema";
 import { uploadToCloudinaryBlog, deleteFromCloudinary } from "@/lib/cloudinary";
 
+
+import fs from "fs";
+import path from "path";
+import { writeFile, unlink } from "fs/promises";
+
+
+
 /* ===========================
    GET: Blogs (by category optional)
 =========================== */
@@ -61,15 +68,48 @@ export async function PUT(request, { params }) {
     };
 
     // replace image ONLY if new one is sent
-    if (image && typeof image === "object") {
+    // if (image && typeof image === "object") {
+    //   if (blog.imagePublicId) {
+    //     await deleteFromCloudinary(blog.imagePublicId);
+    //   }
+
+    //   const uploadResult = await uploadToCloudinaryBlog(image);
+    //   updateData.imageUrl = uploadResult?.secure_url || "";
+    //   updateData.imagePublicId = uploadResult?.public_id || "";
+    // }
+
+// replace image ONLY if new one is sent
+    if (image && typeof image === "object" && image.size > 0) {
+      // Delete old local file if it exists
       if (blog.imagePublicId) {
-        await deleteFromCloudinary(blog.imagePublicId);
+        const oldFilePath = path.join(process.cwd(), "public", "uploads", blog.imagePublicId);
+        try {
+          if (fs.existsSync(oldFilePath)) await unlink(oldFilePath);
+        } catch (error) {
+          console.error("Failed to delete old image:", error);
+        }
       }
 
-      const uploadResult = await uploadToCloudinaryBlog(image);
-      updateData.imageUrl = uploadResult?.secure_url || "";
-      updateData.imagePublicId = uploadResult?.public_id || "";
+      // Save new local file
+      const bytes = await image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const fileExtension = path.extname(image.name) || ".jpg";
+      const filename = `${uniqueSuffix}${fileExtension}`;
+
+      await writeFile(path.join(uploadDir, filename), buffer);
+
+      updateData.imageUrl = `/uploads/${filename}`;
+      updateData.imagePublicId = filename;
     }
+
+
 
     const updatedBlog = await Blog.findByIdAndUpdate(params.id, updateData, {
       new: true,
@@ -93,10 +133,23 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "Blog not found" }, { status: 404 });
     }
 
+    // if (blog.imagePublicId) {
+    //   await deleteFromCloudinary(blog.imagePublicId);
+    // }
+
+
     if (blog.imagePublicId) {
-      await deleteFromCloudinary(blog.imagePublicId);
+      const filePath = path.join(process.cwd(), "public", "uploads", blog.imagePublicId);
+      try {
+        if (fs.existsSync(filePath)) {
+          await unlink(filePath);
+        }
+      } catch (error) {
+        console.error("Failed to delete local image:", error);
+      }
     }
 
+    
     await Blog.findByIdAndDelete(params.id);
 
     return NextResponse.json({

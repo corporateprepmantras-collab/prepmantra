@@ -4,6 +4,14 @@ import { Blog } from "@/models";
 import { uploadToCloudinaryBlog } from "@/lib/cloudinary";
 import { serializeMongoArray, serializeMongoDoc } from "@/lib/mongoHelpers";
 
+
+
+import fs from "fs";
+import path from "path";
+import { writeFile } from "fs/promises";
+
+
+
 /* ===========================
    GET: List Blogs
 =========================== */
@@ -57,7 +65,7 @@ export async function GET(request) {
 }
 
 /* ===========================
-   POST: Create Blog
+   POST: Create Blog 
    (NO VALIDATION)
 =========================== */
 export async function POST(request) {
@@ -71,11 +79,40 @@ export async function POST(request) {
     const image = formData.get("image");
 
     // upload ONLY if image exists
-    if (image && typeof image === "object") {
-      const uploadResult = await uploadToCloudinaryBlog(image);
-      imageUrl = uploadResult?.secure_url || "";
-      imagePublicId = uploadResult?.public_id || "";
-    }
+    // if (image && typeof image === "object") {
+    //   const uploadResult = await uploadToCloudinaryBlog(image);
+    //   imageUrl = uploadResult?.secure_url || "";
+    //   imagePublicId = uploadResult?.public_id || "";
+    // }
+
+
+    // upload ONLY if image exists
+if (image && typeof image === "object" && image.size > 0) {
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Define target directory (public/uploads)
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+  // Ensure directory exists
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  // Generate a unique file name
+  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+  const fileExtension = path.extname(image.name) || ".jpg";
+  const filename = `${uniqueSuffix}${fileExtension}`;
+  const filePath = path.join(uploadDir, filename);
+
+  // Write file to local disk
+  await writeFile(filePath, buffer);
+
+  // Web-accessible relative path
+  imageUrl = `/uploads/${filename}`;
+  imagePublicId = filename; // Using filename as a fallback identifier
+}
+
 
     const title = (formData.get("title") || "").toString().trim() || "Untitled";
     const content =

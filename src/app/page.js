@@ -171,7 +171,7 @@ async function fetchBlogs() {
 
     const data = result.data;
     let blogs = [];
-
+  
     // ✅ normalize API response
     if (Array.isArray(data)) {
       blogs = data;
@@ -247,7 +247,7 @@ async function fetchContent2() {
 
 async function fetchProducts() {
   const result = await fetchWithTimeout(
-    "/api/products?limit=30",
+    "/api/products?limit=12",
     8000,
     2,
     "force-cache",
