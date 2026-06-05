@@ -3,6 +3,14 @@ import { connectMongoDB } from "@/lib/mongo";
 import ProductCategory from "@/models/productCategorySchema";
 import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary";
 
+
+
+import fs from "fs";
+import path from "path";
+import { writeFile, unlink } from "fs/promises";
+
+
+
 // 📌 PUT - Update category by ID
 export async function PUT(req, { params }) {
   try {
@@ -69,27 +77,64 @@ export async function PUT(req, { params }) {
     }
 
     // ✅ Handle image upload/update
+    // let imageUrl = existingCategory.image;
+    // let publicId = existingCategory.public_id;
+
+    // if (file instanceof File && file.type.startsWith("image/")) {
+    //   // Delete old image if exists
+    //   if (existingCategory.public_id) {
+    //     try {
+    //       await deleteFromCloudinary(existingCategory.public_id);
+    //     } catch (error) {
+    //       console.error("Failed to delete old image:", error);
+    //     }
+    //   }
+
+    //   // Upload new image
+    //   const uploadResult = await uploadToCloudinary(file);
+    //   if (!uploadResult.secure_url || !uploadResult.public_id) {
+    //     throw new Error("Cloudinary upload failed");
+    //   }
+    //   imageUrl = uploadResult.secure_url;
+    //   publicId = uploadResult.public_id;
+    // }
+
+
+
+    // ✅ Handle local image update
     let imageUrl = existingCategory.image;
     let publicId = existingCategory.public_id;
 
-    if (file instanceof File && file.type.startsWith("image/")) {
-      // Delete old image if exists
+    if (file instanceof File && file.type.startsWith("image/") && file.size > 0) {
+      // Delete old local file if it exists
       if (existingCategory.public_id) {
+        const oldFilePath = path.join(process.cwd(), "public", "uploads", existingCategory.public_id);
         try {
-          await deleteFromCloudinary(existingCategory.public_id);
+          if (fs.existsSync(oldFilePath)) await unlink(oldFilePath);
         } catch (error) {
           console.error("Failed to delete old image:", error);
         }
       }
 
-      // Upload new image
-      const uploadResult = await uploadToCloudinary(file);
-      if (!uploadResult.secure_url || !uploadResult.public_id) {
-        throw new Error("Cloudinary upload failed");
+      // Save new local file
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
       }
-      imageUrl = uploadResult.secure_url;
-      publicId = uploadResult.public_id;
+
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const fileExtension = path.extname(file.name) || ".jpg";
+      const filename = `${uniqueSuffix}${fileExtension}`;
+
+      await writeFile(path.join(uploadDir, filename), buffer);
+
+      imageUrl = `/uploads/${filename}`;
+      publicId = filename;
     }
+
 
     // ✅ Update category
     const updatedCategory = await ProductCategory.findByIdAndUpdate(
@@ -144,13 +189,29 @@ export async function DELETE(req, { params }) {
     }
 
     // Delete image from Cloudinary if exists
+    // if (category.public_id) {
+    //   try {
+    //     await deleteFromCloudinary(category.public_id);
+    //   } catch (error) {
+    //     console.error("Failed to delete image:", error);
+    //   }
+    // }
+
+
+
+    // Delete image from local folder if exists
     if (category.public_id) {
+      const filePath = path.join(process.cwd(), "public", "uploads", category.public_id);
       try {
-        await deleteFromCloudinary(category.public_id);
+        if (fs.existsSync(filePath)) {
+          await unlink(filePath);
+        }
       } catch (error) {
-        console.error("Failed to delete image:", error);
+        console.error("Failed to delete local image:", error);
       }
     }
+
+    
 
     await ProductCategory.findByIdAndDelete(id);
 
