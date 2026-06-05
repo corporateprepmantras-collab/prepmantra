@@ -344,17 +344,15 @@ export default async function itcertificationsPage() {
                 >
                   {/* Image Container */}
                   <div className="h-8 sm:h-10 md:h-12 lg:h-14 xl:h-16 w-full relative bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors duration-300 flex items-center justify-center">
-                    <ImageWithSkeleton
-                      src={item.image || "https://via.placeholder.com/150"}
-                      alt={item.name || "Category"}
-                      fill
-                      className="object-contain p-0.5 sm:p-1 md:p-1.5 group-hover:scale-110 transition-transform duration-300"
-                      sizes="(max-width: 640px) 120px, (max-width: 768px) 135px, (max-width: 1024px) 150px, (max-width: 1280px) 160px, 170px"
-                      loading={isPriority ? "eager" : "lazy"}
-                      priority={isPriority}
-                      quality={75}
-                      skeletonClassName="rounded-t-xl sm:rounded-t-2xl"
-                    />
+                    <img
+  src={item.image || "https://via.placeholder.com/150"}
+  alt={item.name || "Category"}
+  width={170}
+  height={170}
+  className="w-full h-auto object-contain p-0.5 sm:p-1 md:p-1.5 group-hover:scale-110 transition-transform duration-300 rounded-t-xl sm:rounded-t-2xl"
+  loading={isPriority ? "eager" : "lazy"}
+  decoding="async"
+/>
                   </div>
 
                   {/* Text Container */}
