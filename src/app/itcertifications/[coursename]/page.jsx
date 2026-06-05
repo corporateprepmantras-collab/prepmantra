@@ -263,9 +263,9 @@ export default async function CategoryPage({ params, searchParams }) {
             </h1>
             {category.description && (
               <div
-                className="prose prose-sm sm:prose-base max-w-none text-gray-700 [&>*]:mb-1.5 [&>*]:sm:mb-2 [&>*:last-child]:mb-0 [&>p]:text-[13px] [&>p]:sm:text-sm [&>p]:md:text-base [&>p]:leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: category.description }}
-              />
+  className="prose prose-sm sm:prose-base max-w-full text-gray-700 [&>*]:mb-1.5 [&>*]:sm:mb-2 [&>*:last-child]:mb-0 [&>p]:text-[13px] [&>p]:sm:text-sm [&>p]:md:text-base [&>p]:leading-relaxed [&>*]:max-w-full [&>*]:overflow-hidden [&>*]:break-words"
+  dangerouslySetInnerHTML={{ __html: category.description }}
+/>
             )}
           </div>
         )}
