@@ -87,32 +87,33 @@ export async function POST(request) {
 
 
     // upload ONLY if image exists
-if (image && typeof image === "object" && image.size > 0) {
-  const bytes = await image.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+// ✅ Save image using remote PHP API
+    if (image && typeof image === "object" && image.size > 0) {
+      const phpFormData = new FormData();
+      phpFormData.append("image", image);
 
-  // Define target directory (public/uploads)
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
+      try {
+        const phpResponse = await fetch("https://examdumps360.com/prepmantra/upload.php", {
+          method: "POST",
+          body: phpFormData,
+        });
 
-  // Ensure directory exists
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
+        const uploadResult = await phpResponse.json();
 
-  // Generate a unique file name
-  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-  const fileExtension = path.extname(image.name) || ".jpg";
-  const filename = `${uniqueSuffix}${fileExtension}`;
-  const filePath = path.join(uploadDir, filename);
-
-  // Write file to local disk
-  await writeFile(filePath, buffer);
-
-  // Web-accessible relative path
-  imageUrl = `/uploads/${filename}`;
-  imagePublicId = filename; // Using filename as a fallback identifier
-}
-
+        if (uploadResult.success) {
+          imageUrl = uploadResult.url;
+          imagePublicId = uploadResult.filename;
+        } else {
+          throw new Error(uploadResult.error || "PHP upload failed");
+        }
+      } catch (error) {
+        console.error("PHP Upload Error:", error);
+        return NextResponse.json(
+          { error: "Image upload failed: " + error.message },
+          { status: 500 }
+        );
+      }
+    }
 
     const title = (formData.get("title") || "").toString().trim() || "Untitled";
     const content =

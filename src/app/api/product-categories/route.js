@@ -93,27 +93,36 @@ export async function POST(req) {
 
 
 // ✅ Save image locally if provided
+    // ✅ Save image using remote PHP API
     let imageUrl = "";
     let publicId = "";
+
     if (file instanceof File && file.type.startsWith("image/") && file.size > 0) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const phpFormData = new FormData();
+      phpFormData.append("image", file);
 
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+      try {
+        const phpResponse = await fetch("https://examdumps360.com/prepmantra/upload.php", {
+          method: "POST",
+          body: phpFormData,
+        });
+
+        const uploadResult = await phpResponse.json();
+
+        if (uploadResult.success) {
+          imageUrl = uploadResult.url;
+          publicId = uploadResult.filename;
+        } else {
+          throw new Error(uploadResult.error || "PHP upload failed");
+        }
+      } catch (error) {
+        console.error("PHP Upload Error:", error);
+        return NextResponse.json(
+          { message: "Image upload failed", error: error.message },
+          { status: 500 }
+        );
       }
-
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const fileExtension = path.extname(file.name) || ".jpg";
-      const filename = `${uniqueSuffix}${fileExtension}`;
-
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      imageUrl = `/uploads/${filename}`;
-      publicId = filename; // Storing filename to handle deletion later
     }
-
 
     // ✅ Save to MongoDB
     const newCategory = new ProductCategory({
@@ -235,35 +244,36 @@ export async function PUT(req) {
 
 
 // ✅ Handle local image update
+    // ✅ Handle remote PHP image update
     let imageUrl = existingCategory.image;
     let publicId = existingCategory.public_id;
 
     if (file instanceof File && file.type.startsWith("image/") && file.size > 0) {
-      // Delete old local file if it exists
-      if (existingCategory.public_id) {
-        const oldFilePath = path.join(process.cwd(), "public", "uploads", existingCategory.public_id);
-        try {
-          if (fs.existsSync(oldFilePath)) await unlink(oldFilePath);
-        } catch (error) {
-          console.error("Failed to delete old image:", error);
+      const phpFormData = new FormData();
+      phpFormData.append("image", file);
+
+      try {
+        const phpResponse = await fetch("https://examdumps360.com/prepmantra/upload.php", {
+          method: "POST",
+          body: phpFormData,
+        });
+
+        const uploadResult = await phpResponse.json();
+
+        if (uploadResult.success) {
+          imageUrl = uploadResult.url;
+          publicId = uploadResult.filename;
+        } else {
+          throw new Error(uploadResult.error || "PHP upload failed");
         }
+      } catch (error) {
+        console.error("PHP Upload Error:", error);
+        return NextResponse.json(
+          { message: "Image upload failed", error: error.message },
+          { status: 500 }
+        );
       }
-
-      // Save new local file
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const fileExtension = path.extname(file.name) || ".jpg";
-      const filename = `${uniqueSuffix}${fileExtension}`;
-
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      imageUrl = `/uploads/${filename}`;
-      publicId = filename;
     }
-
 
 
 

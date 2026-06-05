@@ -79,34 +79,32 @@ export async function PUT(request, { params }) {
     // }
 
 // replace image ONLY if new one is sent
+    // ✅ Replace image via remote PHP API only if a new one is sent
     if (image && typeof image === "object" && image.size > 0) {
-      // Delete old local file if it exists
-      if (blog.imagePublicId) {
-        const oldFilePath = path.join(process.cwd(), "public", "uploads", blog.imagePublicId);
-        try {
-          if (fs.existsSync(oldFilePath)) await unlink(oldFilePath);
-        } catch (error) {
-          console.error("Failed to delete old image:", error);
+      const phpFormData = new FormData();
+      phpFormData.append("image", image);
+
+      try {
+        const phpResponse = await fetch("https://examdumps360.com/prepmantra/upload.php", {
+          method: "POST",
+          body: phpFormData,
+        });
+
+        const uploadResult = await phpResponse.json();
+
+        if (uploadResult.success) {
+          updateData.imageUrl = uploadResult.url;
+          updateData.imagePublicId = uploadResult.filename;
+        } else {
+          throw new Error(uploadResult.error || "PHP upload failed");
         }
+      } catch (error) {
+        console.error("PHP Upload Error:", error);
+        return NextResponse.json(
+          { error: "Image upload failed: " + error.message },
+          { status: 500 }
+        );
       }
-
-      // Save new local file
-      const bytes = await image.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const fileExtension = path.extname(image.name) || ".jpg";
-      const filename = `${uniqueSuffix}${fileExtension}`;
-
-      await writeFile(path.join(uploadDir, filename), buffer);
-
-      updateData.imageUrl = `/uploads/${filename}`;
-      updateData.imagePublicId = filename;
     }
 
 
