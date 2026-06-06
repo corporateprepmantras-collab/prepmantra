@@ -321,7 +321,7 @@ export default async function CategoryPage({ params, searchParams }) {
             {category && category.descriptionBelow && (
               <div className="my-4 sm:my-5 md:my-6 shadow-md rounded-xl border border-gray-200 p-3 sm:p-4 md:p-5 bg-white">
                 <div
-                  className="prose prose-sm sm:prose-base max-w-none text-gray-700 [&>*]:mb-1.5 [&>*]:sm:mb-2 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&>h1]:text-lg [&>h1]:sm:text-xl [&>h1]:md:text-2xl [&>h2]:text-base [&>h2]:sm:text-lg [&>h2]:md:text-xl [&>h3]:text-sm [&>h3]:sm:text-base [&>h3]:md:text-lg [&>p]:text-[13px] [&>p]:sm:text-sm [&>p]:md:text-base [&>p]:leading-relaxed"
+                  className="prose prose-sm sm:prose-base max-w-full text-gray-700 [&>*]:mb-1.5 [&>*]:sm:mb-2 [&>*:last-child]:mb-0 [&>p]:text-[13px] [&>p]:sm:text-sm [&>p]:md:text-base [&>p]:leading-relaxed [&>*]:max-w-full [&>*]:overflow-hidden [&>*]:break-words"
                   dangerouslySetInnerHTML={{
                     __html: category.descriptionBelow,
                   }}

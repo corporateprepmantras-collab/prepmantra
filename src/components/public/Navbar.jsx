@@ -82,7 +82,7 @@ export default function Navbar() {
           fetch("/api/product-categories"),
         ]);
 
-        const blogData = blogRes.ok ? await blogRes.json() : [];
+         const blogData = blogRes.ok ? await blogRes.json() : [];
         const productData = productRes.ok ? await productRes.json() : [];
 
         const categories = {

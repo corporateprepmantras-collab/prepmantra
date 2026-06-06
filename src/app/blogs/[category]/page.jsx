@@ -18,63 +18,58 @@ export default function BlogPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // ✅ Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get(`/api/blogs/blog-categories`);
-        const valid = res.data?.filter((c) => !!c.category);
-        setCategories(valid);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
+// ✅ Fetch categories
+useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`/api/blogs/blog-categories`);
+      const raw = res.data?.data ?? (Array.isArray(res.data) ? res.data : []);
+      const valid = raw.filter((c) => !!c.category);
+      setCategories(valid);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+  fetchCategories();
+}, []);
 
   // ✅ Fetch blogs
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`/api/blogs`);
-        const allBlogs = res.data?.data || [];
+useEffect(() => {
+  const fetchBlogs = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`/api/blogs`);
+      const allBlogs = res.data?.data || [];
 
-        // Filter by selected category (match category field)
-        const filteredByCategory = selectedCategory
-          ? allBlogs.filter(
-              (b) =>
-                typeof b.category === "string" &&
-                b.category.toLowerCase() === selectedCategory.toLowerCase(),
-            )
-          : allBlogs;
+      const filteredByCategory = selectedCategory
+  ? allBlogs.filter((b) => {
+      const blogCat =   b.category || "";
+      console.log("🔍 blogCat:", JSON.stringify(b.category), "| slug:", selectedCategory);
+      return blogCat.trim().toLowerCase() === decodeURIComponent(selectedCategory).trim().toLowerCase();
+    })
+  : allBlogs;
 
-        // Filter by search query
-        const filteredBlogs = search
-          ? filteredByCategory.filter((b) =>
-              b.sectionName?.toLowerCase().includes(search.toLowerCase()),
-            )
-          : filteredByCategory;
-
-        setBlogs(filteredBlogs);
-
-        // Top 10 recent posts
-        const recent = [...allBlogs]
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      const filteredBlogs = search
+        ? filteredByCategory.filter((b) =>
+            b.title?.toLowerCase().includes(search.toLowerCase())
           )
-          .slice(0, 10);
-        setRecentPosts(recent);
-      } catch (err) {
-        console.error("Error fetching blogs:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+        : filteredByCategory;
 
-    fetchBlogs();
-  }, [selectedCategory, search]);
+      setBlogs(filteredBlogs);
+
+      const recent = [...allBlogs]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 10);
+      setRecentPosts(recent);
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchBlogs();
+}, [selectedCategory, search, categories]);
 
   return (
     <div className="min-h-screen bg-white">
