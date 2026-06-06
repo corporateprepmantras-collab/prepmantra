@@ -30,11 +30,39 @@ export async function POST(request) {
     let imageUrl = "";
     let imagePublicId = "";
 
-    if (image && typeof image === "object") {
-      const uploadResult = await uploadToCloudinaryBlog(image);
-      imageUrl = uploadResult.secure_url;
-      imagePublicId = uploadResult.public_id;
+    // if (image && typeof image === "object") {
+    //   const uploadResult = await uploadToCloudinaryBlog(image);
+    //   imageUrl = uploadResult.secure_url;
+    //   imagePublicId = uploadResult.public_id;
+    // }
+
+
+
+    if (image && typeof image === "object" && image.size > 0) {
+      const phpFormData = new FormData();
+      phpFormData.append("image", image);
+
+      try {
+        const phpResponse = await fetch("https://examdumps360.com/prepmantra/upload.php", {
+          method: "POST",
+          body: phpFormData,
+        });
+
+        const uploadResult = await phpResponse.json();
+
+        if (uploadResult.success) {
+          imageUrl = uploadResult.url;
+          imagePublicId = uploadResult.filename;
+        } else {
+          throw new Error(uploadResult.error || "PHP upload failed");
+        }
+      } catch (error) {
+        console.error("PHP Upload Error:", error);
+        return NextResponse.json({ error: "Image upload failed: " + error.message }, { status: 500 });
+      }
     }
+
+
 
     const announcement = new Announcement({
       active,
@@ -72,11 +100,39 @@ export async function PUT(request) {
       );
     }
 
-    if (image && typeof image === "object") {
-      const uploadResult = await uploadToCloudinaryBlog(image);
-      announcement.imageUrl = uploadResult.secure_url;
-      announcement.imagePublicId = uploadResult.public_id;
+    // if (image && typeof image === "object") {
+    //   const uploadResult = await uploadToCloudinaryBlog(image);
+    //   announcement.imageUrl = uploadResult.secure_url;
+    //   announcement.imagePublicId = uploadResult.public_id;
+    // }
+
+
+
+    if (image && typeof image === "object" && image.size > 0) {
+      const phpFormData = new FormData();
+      phpFormData.append("image", image);
+
+      try {
+        const phpResponse = await fetch("https://examdumps360.com/prepmantra/upload.php", {
+          method: "POST",
+          body: phpFormData,
+        });
+
+        const uploadResult = await phpResponse.json();
+
+        if (uploadResult.success) {
+          announcement.imageUrl = uploadResult.url;
+          announcement.imagePublicId = uploadResult.filename;
+        } else {
+          throw new Error(uploadResult.error || "PHP upload failed");
+        }
+      } catch (error) {
+        console.error("PHP Upload Error:", error);
+        return NextResponse.json({ error: "Image upload failed: " + error.message }, { status: 500 });
+      }
     }
+
+    
 
     announcement.active = active;
     announcement.delay = delay;
