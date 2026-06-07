@@ -6,7 +6,12 @@ import { useParams } from "next/navigation";
 
 export default function BlogPage() {
   const params = useParams();
-  const selectedSlug = params?.slug ? decodeURIComponent(params.slug).trim().toLowerCase() : "";
+  // const selectedSlug = params?.slug ? decodeURIComponent(params.slug).trim().toLowerCase() : "";
+
+
+  const selectedSlug = params?.category ? decodeURIComponent(params.category).trim().toLowerCase() : "";
+
+
 
   const [categories, setCategories] = useState([]);
   const [blogs, setBlogs] = useState([]);
@@ -69,9 +74,9 @@ export default function BlogPage() {
           backgroundImage: `url(https://t3.ftcdn.net/jpg/03/16/91/28/360_F_316912806_RCeHVmUx5LuBMi7MKYTY5arkE4I0DcpU.jpg)`,
         }}
       >
-        <h1 className="text-4xl pt-24 font-bold text-center mb-6">
-          <span className="text-white">OUR BLOG</span>
-        </h1>
+        <h1 className="text-4xl pt-24 font-bold text-center mb-6 text-white">
+  OUR BLOG
+</h1>
         <div className="flex flex-wrap justify-center gap-2">
           <Link href="/blogs">
             <button
