@@ -319,11 +319,12 @@ export default function ExamDumpsSlider({ products = [] }) {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-gray-900 mb-3">
-            Most Popular IT Certification{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600">
-              Dumps
-            </span>
-          </h2>
+  Most{" "}
+  <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600">
+    Popular
+  </span>{" "}
+  IT Certification Products
+</h2>
           <p className="text-gray-600 text-base sm:text-lg">
             Get certified with our premium exam preparation materials
           </p>
@@ -436,9 +437,11 @@ export default function ExamDumpsSlider({ products = [] }) {
                           draggable="false"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <div className="absolute top-2 right-2 bg-orange-500 text-white px-2.5 py-1 rounded-full text-xs font-semibold shadow-lg z-10">
-                          Popular
-                        </div>
+                       {product.isPopular && (
+  <div className="absolute top-2 right-2 bg-orange-500 text-white px-2.5 py-1 rounded-full text-xs font-semibold shadow-lg z-10">
+    Popular
+  </div>
+)}
                       </div>
 
                       {/* Content */}

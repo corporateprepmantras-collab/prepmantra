@@ -247,7 +247,7 @@ async function fetchContent2() {
 
 async function fetchProducts() {
   const result = await fetchWithTimeout(
-    "/api/products?limit=12",
+    "/api/products?popular=true",
     8000,
     2,
     "force-cache",

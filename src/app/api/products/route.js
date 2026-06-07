@@ -141,6 +141,35 @@ export async function GET(req) {
       });
     }
 
+
+    
+    // GET POPULAR PRODUCTS
+const popular = searchParams.get("popular");
+if (popular === "true") {
+  const products = await Product.find({ isPopular: true })
+    .sort({ createdAt: -1 })
+    .select({
+      _id: 1,
+      sapExamCode: 1, 
+      title: 1,
+      price: 1,
+      category: 1,
+      status: 1,
+      publishStatus: 1,
+      sku: 1,
+      examCode: 1,
+      isPopular: 1,
+      showWpConnect: 1,
+    })
+    .lean();
+
+  return NextResponse.json({
+    data: serializeMongoArray(products),
+    total: products.length,
+  });
+}
+
+
     // ✅ POPULAR PRODUCTS WITH LIMIT & OPTIMIZED FIELDS
     if (limit > 0) {
       let sortObj = {};
@@ -192,6 +221,7 @@ export async function GET(req) {
       );
     }
 
+
     // DEFAULT: GET ALL PRODUCTS
     const products = await Product.find().lean();
     return NextResponse.json({
@@ -206,6 +236,9 @@ export async function GET(req) {
     );
   }
 }
+
+
+
 
 // POST /api/products - Create new product
 export async function POST(req) {
@@ -280,6 +313,11 @@ export async function PUT(req) {
     if ("showWpConnect" in updateData) {
       updateData.showWpConnect = updateData.showWpConnect === true || updateData.showWpConnect === "true";
     }
+
+    if ("isPopular" in updateData) {
+  updateData.isPopular = updateData.isPopular === true || updateData.isPopular === "true";
+}
+
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -430,3 +468,27 @@ export async function DELETE(req) {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -106,22 +106,22 @@ export default function HomePage({
   const [showModal, setShowModal] = useState(false);
   const [showDebugInfo, setShowDebugInfo] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [trendingItems, setTrendingItems] = useState([]);
-  const [trendingCategories, setTrendingCategories] = useState([]);
-  const [trendingProducts, setTrendingProducts] = useState([]);
+  // const [trendingItems, setTrendingItems] = useState([]);
+  // const [trendingCategories, setTrendingCategories] = useState([]);
+  // const [trendingProducts, setTrendingProducts] = useState([]);
 
  
  
 
  
   // Use server-provided props for trending lists when available
-  useEffect(() => {
-    if (Array.isArray(dumps) && dumps.length > 0) setTrendingItems(dumps);
-    if (Array.isArray(categories) && categories.length > 0)
-      setTrendingCategories(categories);
-    if (Array.isArray(products) && products.length > 0)
-      setTrendingProducts(products);
-  }, [dumps, categories, products]);
+  // useEffect(() => {
+  //   if (Array.isArray(dumps) && dumps.length > 0) setTrendingItems(dumps);
+  //   if (Array.isArray(categories) && categories.length > 0)
+  //     setTrendingCategories(categories);
+  //   if (Array.isArray(products) && products.length > 0)
+  //     setTrendingProducts(products);
+  // }, [dumps, categories, products]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -528,7 +528,7 @@ export default function HomePage({
                 </p>
               </div>
 
-              {trendingItems?.length > 0 && (
+              {dumps?.length > 0 && (
                 <Link href="/itcertifications" style={{ flexShrink: 0 }}>
                   <button
                     style={{
@@ -575,9 +575,9 @@ export default function HomePage({
             </div>
 
             {/* Grid */}
-            {trendingItems?.length > 0 ? (
+            {dumps?.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trendingItems.map((item, index) => (
+                {dumps.map((item, index) => (
                   <button
                     key={item._id}
                     onClick={() => {
@@ -649,9 +649,9 @@ export default function HomePage({
 
         {/* ─── TRENDING CATEGORIES & PRODUCTS ─── */}
         {(() => {
-          const visibleCategories = (trendingCategories || []).filter(
+          const visibleCategories = (categories || []).filter(
             (category) =>
-              (trendingProducts || []).some(
+              (products || []).some(
                 (p) => p.trendingCategoryId === category._id,
               ),
           );
@@ -741,7 +741,7 @@ export default function HomePage({
                   {/* Category Blocks */}
                   <div className="flex flex-col gap-6">
                     {visibleCategories.map((category, catIndex) => {
-                      const categoryProducts = trendingProducts.filter(
+                      const categoryProducts = products.filter(
                         (p) => p.trendingCategoryId === category._id,
                       );
 
@@ -942,7 +942,13 @@ export default function HomePage({
         {/* ─── Lazy-loaded Sections (unchanged) ─── */}
         {blogs.length > 0 && <BlogSection blogs={blogs} categories={categories} />}
          
-        {products.length > 0 && <ExamDumpsSlider products={products} />}
+        {/* {products.length > 0 && <ExamDumpsSlider products={products} />} */}
+
+        {products.length > 0 && (
+  <ExamDumpsSlider products={products.filter((p) => p.isPopular === true)} />
+)}
+
+
         {content1 && <ContentDumpsFirst content={content1} />}
         <UnlockGoals />
         {/* {content2 && <ContentDumpsSecond content={content2} />} */}
