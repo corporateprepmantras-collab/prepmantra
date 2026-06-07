@@ -157,6 +157,7 @@ if (popular === "true") {
       status: 1,
       publishStatus: 1,
       sku: 1,
+      slug:1,
       examCode: 1,
       isPopular: 1,
       showWpConnect: 1,

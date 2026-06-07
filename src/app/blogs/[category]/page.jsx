@@ -93,7 +93,7 @@ useEffect(() => {
                   : "bg-transparent border-white"
               }`}
             >
-              All
+              All 11
             </button>
           </Link>
         </div>
