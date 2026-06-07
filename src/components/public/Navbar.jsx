@@ -281,11 +281,18 @@ export default function Navbar() {
                       {dropdownData[item.dropdownKey].map((sub, i) => (
                         <li key={i}>
                           <Link
+                            // href={`/${
+                            //   item.dropdownKey === "itcertifications"
+                            //     ? "itcertifications"
+                            //     : "blogs"
+                            // }/${sub.toLowerCase().replace(/\s+/g, "-")}`}
+
                             href={`/${
-                              item.dropdownKey === "itcertifications"
-                                ? "itcertifications"
-                                : "blogs"
-                            }/${sub.toLowerCase().replace(/\s+/g, "-")}`}
+  item.dropdownKey === "itcertifications"
+    ? "itcertifications"
+    : "blogs"
+}/${encodeURIComponent(sub.trim().toLowerCase())}`}
+
                             className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-[#113d48] hover:to-indigo-600 hover:text-white transition-all duration-200 border-b last:border-b-0 border-gray-100"
                           >
                             {sub}

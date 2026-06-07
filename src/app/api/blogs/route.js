@@ -44,11 +44,22 @@ export async function GET(request) {
     query.status = "publish";
 
     const blogs = await Blog.find(query)
-      .populate("category", "sectionName category")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+  .populate("category", "sectionName category")
+  .sort({ createdAt: -1 })
+  .skip(skip)
+  .limit(limit)
+  .select({
+    _id: 1,
+    title: 1,
+    slug: 1,
+    category: 1,
+    imageUrl: 1,
+    status: 1,
+    metaTitle: 1,
+    metaDescription: 1,
+    createdAt: 1,
+  })
+  .lean();
 
     const total = await Blog.countDocuments(query);
 

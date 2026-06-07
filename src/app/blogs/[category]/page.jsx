@@ -2,74 +2,63 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function BlogPage() {
   const params = useParams();
-  const pathname = usePathname();
-
-  // if route is /blogsPages -> no category selected
-  // if route is /blogsPages/[slug] -> category selected
-  const selectedCategory = params?.slug || "";
+  const selectedSlug = params?.slug ? decodeURIComponent(params.slug).trim().toLowerCase() : "";
 
   const [categories, setCategories] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [recentPosts, setRecentPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
 
-// ✅ Fetch categories
-useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get(`/api/blogs/blog-categories`);
-      const raw = res.data?.data ?? (Array.isArray(res.data) ? res.data : []);
-      const valid = raw.filter((c) => !!c.category);
-      setCategories(valid);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-    }
-  };
-  fetchCategories();
-}, []);
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(`/api/blogs/blog-categories`);
+        const raw = res.data?.data ?? (Array.isArray(res.data) ? res.data : []);
+        setCategories(raw.filter((c) => !!c.category));
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  // ✅ Fetch blogs
-useEffect(() => {
-  const fetchBlogs = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`/api/blogs`);
-      const allBlogs = res.data?.data || [];
+  // Fetch blogs
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`/api/blogs`);
+        const allBlogs = res.data?.data || [];
 
-      const filteredByCategory = selectedCategory
-  ? allBlogs.filter((b) => {
-      const blogCat =   b.category || "";
-      console.log("🔍 blogCat:", JSON.stringify(b.category), "| slug:", selectedCategory);
-      return blogCat.trim().toLowerCase() === decodeURIComponent(selectedCategory).trim().toLowerCase();
-    })
-  : allBlogs;
+        const filtered = selectedSlug
+          ? allBlogs.filter((b) => {
+              const cat = b.category;
+              // category is populated object
+              const catName = (cat?.category || cat?.sectionName || "").trim().toLowerCase();
+              const catSlug = (cat?.slug || "").trim().toLowerCase();
+              return catName === selectedSlug || catSlug === selectedSlug;
+            })
+          : allBlogs;
 
-      const filteredBlogs = search
-        ? filteredByCategory.filter((b) =>
-            b.title?.toLowerCase().includes(search.toLowerCase())
-          )
-        : filteredByCategory;
+        setBlogs(filtered);
 
-      setBlogs(filteredBlogs);
-
-      const recent = [...allBlogs]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 10);
-      setRecentPosts(recent);
-    } catch (err) {
-      console.error("Error fetching blogs:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchBlogs();
-}, [selectedCategory, search, categories]);
+        const recent = [...allBlogs]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 10);
+        setRecentPosts(recent);
+      } catch (err) {
+        console.error("Error fetching blogs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, [selectedSlug]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -81,21 +70,37 @@ useEffect(() => {
         }}
       >
         <h1 className="text-4xl pt-24 font-bold text-center mb-6">
-          <span className="text-white"> OUR BLOG</span>{" "}
+          <span className="text-white">OUR BLOG</span>
         </h1>
         <div className="flex flex-wrap justify-center gap-2">
-          {/* All blogs */}
           <Link href="/blogs">
             <button
               className={`px-4 py-1 rounded-full border ${
-                !selectedCategory
+                !selectedSlug
                   ? "bg-white text-black font-semibold"
-                  : "bg-transparent border-white"
+                  : "bg-transparent border-white text-white"
               }`}
             >
-              All 11
+              All
             </button>
           </Link>
+          {categories.map((cat) => {
+            const catSlug = cat.slug?.trim().toLowerCase() || cat.category.trim().toLowerCase();
+            const isActive = selectedSlug === catSlug || selectedSlug === cat.category.trim().toLowerCase();
+            return (
+              <Link key={cat._id} href={`/blogs/${encodeURIComponent(cat.category.trim().toLowerCase())}`}>
+                <button
+                  className={`px-4 py-1 rounded-full border ${
+                    isActive
+                      ? "bg-white text-black font-semibold"
+                      : "bg-transparent border-white text-white"
+                  }`}
+                >
+                  {cat.sectionName || cat.category}
+                </button>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -103,28 +108,22 @@ useEffect(() => {
         {/* Blog Cards */}
         <div className="w-full lg:w-3/4 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
-            <p className="text-center text-gray-500 col-span-full">
-              Loading blogs...
-            </p>
+            <p className="text-center text-gray-500 col-span-full">Loading blogs...</p>
           ) : blogs.length === 0 ? (
-            <p className="text-gray-600 italic col-span-full">
-              No blogs found.
-            </p>
+            <p className="text-gray-600 italic col-span-full">No blogs found.</p>
           ) : (
             blogs.map((blog) => (
               <Link key={blog._id} href={`/blog/${blog.slug || blog._id}`}>
-                <div className="bg-gray-100 w-120 h-full flex flex-col justify-between rounded-xl shadow-md p-4 hover:shadow-lg transition">
+                <div className="bg-gray-100 h-full flex flex-col justify-between rounded-xl shadow-md p-4 hover:shadow-lg transition">
                   {blog.imageUrl && (
                     <img
                       src={blog.imageUrl}
-                      alt={blog.sectionName}
+                      alt={blog.title}
                       className="w-full h-60 object-cover rounded mb-4"
                     />
                   )}
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      {blog.sectionName}
-                    </h2>
+                    <h2 className="text-lg font-semibold text-gray-800">{blog.title}</h2>
                     <p className="text-sm text-gray-500 mt-1">
                       {new Date(blog.createdAt).toLocaleDateString()}
                     </p>
