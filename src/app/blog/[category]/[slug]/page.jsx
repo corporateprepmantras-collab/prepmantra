@@ -92,7 +92,7 @@ function stripHtml(html) {
 
 // ✅ Dynamic SEO setup with proper error handling
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
+  const { category, slug } = await params;
 
   try {
     const blog = await fetchBlogForMetadata(slug);
@@ -242,12 +242,25 @@ export async function generateStaticParams() {
 
     const params = blogs
       .filter(
-        (blog) =>
-          blog.slug && (blog.status === "active" || blog.published !== false),
-      )
-      .map((blog) => ({
-        slug: blog.slug,
-      }))
+  (blog) =>
+    blog.slug &&
+    blog.category &&        // ← add this
+    (blog.status === "active" || blog.published !== false)
+)
+      .map((blog) => {
+  // category could be an object like { _id: "...", slug: "...", name: "..." }
+  // or just a string ID
+  const category =
+    blog.category?.slug ||
+    blog.category?.name ||
+    blog.category?._id?.toString() ||
+    (typeof blog.category === "string" ? blog.category : "general");
+
+  return {
+    category: String(category),
+    slug: String(blog.slug),
+  };
+})
       .slice(0, 100); // Limit to first 100 blogs
 
     console.log(`✅ Generated ${params.length} static params`);
@@ -260,7 +273,7 @@ export async function generateStaticParams() {
 
 // ✅ Page Component with proper error handling
 export default async function BlogPage({ params }) {
-  const { slug } = await params;
+  const { category, slug } = await params;
 
   // Verify blog exists before rendering
   const blog = await fetchBlogForMetadata(slug);

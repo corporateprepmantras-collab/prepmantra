@@ -331,7 +331,7 @@ const BlogDetail = ({ slug }) => {
                   </h3>
                   <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     {recentBlogs.slice(0, 5).map((b, index) => (
-                      <Link key={b._id} href={`/blog/${b.slug}`}>
+                      <Link key={b._id} href={`/blog/${b.category?.slug || b.category || "general"}/${b.slug}`}>
                         <div className="group p-2 sm:p-3 rounded-lg sm:rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 cursor-pointer">
                           {/* Full-width image on top */}
                           {b.imageUrl ? (
