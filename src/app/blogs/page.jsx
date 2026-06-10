@@ -221,7 +221,7 @@ const BlogPage = () => {
                   {blogs.map((blog, idx) => (
                     <Link
                       key={blog._id ?? blog.slug ?? idx}
-                      href={`/blog/${blog.slug}`}
+                      href={`/blog/${blog.category?.category}/${blog.slug}`}
                       className="block"
                     >
                       <article className="bg-white h-full flex flex-col rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2">
