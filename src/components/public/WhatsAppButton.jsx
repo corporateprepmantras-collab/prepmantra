@@ -20,7 +20,7 @@ export default function WhatsAppButton() {
   }, []);
 
   const whatsappUrl =
-    "https://wa.me/919871952577?text=Hi%2C%20I%20need%20help%20with%20IT%20certification%20prep%20at%20PrepMantras.";
+    "https://wa.me/919911876877?text=Hi%2C%20I%20need%20help%20with%20IT%20certification%20prep%20at%20PrepMantras.";
 
   return (
     <div 

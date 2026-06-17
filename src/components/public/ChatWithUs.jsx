@@ -3,9 +3,9 @@
 import { usePathname } from "next/navigation";
 import { FaPhone, FaWhatsapp } from "react-icons/fa";
 
-const PHONE_DISPLAY = "9871952577";
-const PHONE_TEL = "+919871952577";
-const PHONE_WHATSAPP = "919871952577";
+const PHONE_DISPLAY = "9911876877";
+const PHONE_TEL = "+919911876877";
+const PHONE_WHATSAPP = "919911876877";
 
 export default function ChatWithUs() {
   const pathname = usePathname();
